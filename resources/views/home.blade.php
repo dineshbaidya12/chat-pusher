@@ -23,200 +23,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.1/sweetalert2.min.css" />
     <link href=" https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.min.css " rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <style>
-        .conversation-chats-container {
-            width: 100%;
-            height: 97vh;
-            background: url('{{ asset('assets/images/bg/dark-travel.jpeg') }}') no-repeat center/cover;
-        }
-
-        .small-right-bar {
-            /* display: none; */
-        }
-
-        .emoji-btn {
-            top: 19px;
-            left: 15px;
-            color: #464646c9;
-            font-size: 19px;
-            cursor: pointer;
-        }
-
-        .emoji-div {
-            display: none;
-            width: 93%;
-            bottom: 97px;
-            z-index: 999999;
-            left: 11px;
-            scrollbar-width: thin;
-        }
-
-        emoji-picker {
-            width: 100%;
-            --num-columns: 15;
-            --emoji-size: 1.5rem;
-            --background: #202124;
-        }
-
-        .picker {
-            width: 100%;
-        }
-
-        .more-opt-left-icon {
-            padding-right: 12px;
-        }
-
-        .more-option-left {
-            right: 24px;
-            top: 32px;
-            background: white;
-            color: black;
-            list-style: none;
-            width: 123px;
-            background: white;
-            color: black;
-            font-size: .8rem;
-            cursor: pointer;
-            padding: 0px 7px 0px 7px;
-            user-select: none;
-            overflow: hidden;
-            transition: all 0.2s ease-in;
-            opacity: 0;
-            height: 0;
-            z-index: 999;
-        }
-
-        .more-option-left a {
-            text-decoration: none;
-            color: black !important;
-        }
-
-        .more-option-left a li {
-            font-family: var(--primary-heading);
-            padding-bottom: 2px;
-        }
-
-        .more-option-left.active {
-            padding: 7px;
-            opacity: 1;
-            height: fit-content;
-        }
-
-
-        #right-bar {
-            transform: translateX(0px);
-        }
-
-        .go-back-cont {
-            display: none;
-        }
-
-        .no-conv {
-            color: white;
-            text-align: center;
-            background: #31864e;
-            display: inline;
-            padding: 5px 25px;
-            border-radius: 20px;
-            margin: auto;
-        }
-
-        .no-conv-div {
-            display: flex;
-            align-items: center;
-        }
-
-        .deleted-msg {
-            font-size: 14px;
-            font-family: 'Josefin Sans', sans-serif;
-            font-style: italic;
-        }
-
-        .status-deleted {
-            width: 15px;
-            margin-top: -5px;
-        }
-
-
-
-        /* Green Circle count how much unread message */
-
-        .unread-msg-count {
-            display: inline-block;
-            font-family: var(--primary-heading);
-            font-size: 12px;
-            background: #258825;
-            padding: 0px 7px;
-            border-radius: 50%;
-            margin-left: 5px;
-        }
-
-        #type-message {
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: thin;
-            scrollbar-color: #394053 #4f5055;
-        }
-
-        #type-message::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        #type-message::-webkit-scrollbar-thumb {
-            background-color: #394053;
-        }
-
-        #type-message::-webkit-scrollbar-track {
-            background-color: #4f5055;
-        }
-
         .inner-rightbar-cover {
-            position: absolute;
-            height: 100%;
-            width: 100%;
-            background: white;
             background: url("{{ asset('assets/images/bg/welcome.jpg') }}") no-repeat center center/cover;
-            z-index: 9999;
-            right: 0;
-            top: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
         }
 
-        .str-conv-h1 {
-            font-size: 40px;
-            font-family: var(--primary-heading);
-            color: white;
-            font-weight: bold;
-            color: #202124;
-            font-weight: bold;
-            font-family: var(--primary-heading);
-            text-shadow: 1px 1px 1px #f97d7d;
-        }
-
-        .preloader {
-            height: 100vh;
-            width: 100vw;
-            background: white;
-            z-index: 99999;
-            top: 0;
-            left: 0;
-            position: absolute;
-        }
-
-        .add-new-connections {
-            bottom: 10px;
-            right: 12px;
-            z-index: 999;
-        }
-
-        .add-new-connections img {
-            height: 30px;
-            width: 30px;
-            object-fit: cover;
-            cursor: pointer;
+        .conversation-chats-container {
+            background: url("{{ asset('assets/images/bg/dark-travel.jpeg') }}") no-repeat center/cover;
         }
 
         @keyframes rotate {
@@ -239,201 +53,6 @@
         .preloader img {
             height: 10%;
             animation: rotate 2s linear infinite;
-        }
-
-        @media (min-width: 420px) and (max-width: 767px) {
-            .users-list {
-                width: 100%;
-                margin-left: 0px;
-            }
-
-            .users-list .inner-user-list {
-                width: 100%;
-            }
-
-            .users-list .inner-user-list .col-12 .row {
-                /* background: white; */
-                max-height: 82px;
-            }
-
-            .users-list .inner-user-list .col-12 .row .users-dp {
-                /* display: none; */
-                max-width: 62px;
-            }
-
-            .users-list .inner-user-list .col-12 .row .user-image-div {
-                /* display: none; */
-                max-width: 120px;
-            }
-        }
-
-        @media (min-width: 768px) {
-            .user-image-div {
-                padding: 0px;
-                padding-left: 7px;
-            }
-
-            .more-opt-left-icon {
-                padding-left: 2px;
-                padding-right: 2px;
-            }
-
-            .more-option-left {
-                right: 16px;
-            }
-
-            #right-bar {
-                transform: translateX(0px);
-            }
-        }
-
-        /* For Less than 768px screen */
-
-        @media (max-width: 767px) {
-            #right-bar {
-                transform: translateX(10px);
-            }
-
-            .go-back-cont {
-                display: block;
-            }
-        }
-
-        /* for textarea  */
-
-        @media(min-width:680px) and (max-width:767px) {
-            #type-message {
-                width: 89%;
-            }
-        }
-
-
-        @media(min-width:580px) and (max-width:680px) {
-            #type-message {
-                width: 87%;
-            }
-        }
-
-        @media(min-width:463px)and (max-width:580px) {
-            #type-message {
-                width: 87%;
-            }
-
-            .send-msg-btn img {
-                top: -16px;
-                right: -9px;
-                height: 120%;
-                width: 120%;
-            }
-        }
-
-        @media(max-width:463px) {
-            #type-message {
-                display: block;
-                width: 97vw;
-                padding-right: 48px;
-            }
-
-            .send-msg-btn {
-                position: absolute;
-                top: 29px;
-                right: 5%;
-            }
-
-            .send-msg-btn img {
-                top: -16px;
-                right: 0px;
-                height: 120%;
-                width: 120%;
-            }
-        }
-
-        /* for textarea  */
-
-        @media (min-width: 992px) and (max-width: 1286px) {
-            .send-msg-btn img {
-                top: -16px;
-                right: -10px;
-                height: 126%;
-                width: 129%;
-            }
-        }
-
-        @media (min-width: 768px) and (max-width: 991px) {
-            #type-message {
-                width: 88%;
-            }
-
-            .send-msg-btn img {
-                top: -15px;
-                right: -19px;
-                height: 135%;
-                width: 135%;
-            }
-
-            .emoji-div {
-                width: 88%;
-            }
-
-            emoji-picker {
-                --num-columns: 8;
-                --emoji-size: 1.5rem;
-                --background: #202124;
-            }
-        }
-
-        #suggetion-container::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        #suggetion-container::-webkit-scrollbar-thumb {
-            background-color: #394053;
-        }
-
-        #suggetion-container::-webkit-scrollbar-track {
-            background-color: #4f5055;
-        }
-
-        #suggetion-container {
-            position: absolute;
-            width: 100%;
-            list-style: none;
-            padding: 9px;
-            background: white;
-            max-height: 150px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: thin;
-            scrollbar-color: #394053 #4f5055;
-            z-index: 999;
-        }
-
-        #suggetion-container li {
-            padding-top: 5px;
-            padding-bottom: 5px;
-            cursor: pointer;
-            transition: .2s ease-in;
-        }
-
-
-        #suggetion-container li:hover {
-            background: #ddd;
-        }
-
-        .suggestion-users {
-            height: 35px;
-            width: 35px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin-right: 10px;
-            margin-right: 10px;
-        }
-
-        #request-connection {
-            background: #202124 !important;
-            color: white;
-            opacity: .1;
-            cursor: no-drop;
         }
     </style>
 </head>
@@ -832,9 +451,8 @@
     <script src="{{ asset('assets/js/script.js') }}"></script>
     <script>
         $(document).ready(function() {
-
             $('.preloader').css('display', 'none');
-
+            // console.log(channel);
 
             //------------scroll to bottom 
             var chatsSec = $('#chats');
@@ -1009,73 +627,6 @@
 
             // ----------------- More opt left --------------//
 
-
-            {{--  // <div class="parent-conv sender">
-            //     <div class="conversations-sender conversations">
-            //         <p>
-            //             @if ($msg->status !== 'deleted')
-            //                 {{ $msg->message ?? '' }}
-            //             @else
-            //                 <img style="padding-top:3px; opacity: .4;"
-            //                     src="{{ asset('assets/images/dummy-imgs/block.png') }}" class="status-deleted"><span
-            //                     class="deleted-msg">This Message was
-            //                     Deleted</span>
-            //             @endif
-            //         </p>
-            //     </div>
-            //     <div class="message-time">{{ \Carbon\Carbon::parse($msg->time)->format('h:iA') }}</div>
-            // </div>
-            --}}
-
-
-            //----------- send message ---------//
-            $('#send-the-msg').on('click', function() {
-                $('.no-conv').css('display', 'none');
-                let chatsDiv = $('#chats');
-                let message = $('#type-message').val().trim();
-                let id = $(this).data('id');
-                // console.log(message);
-
-                if (id != '' && message !== '') {
-                    var newDiv = $('<div>', {
-                        'class': 'parent-conv sender'
-                    });
-
-                    $.ajax({
-                        url: "{{ route('send-messasge') }}",
-                        type: 'POST',
-                        data: {
-                            id: id,
-                            message: message,
-                            '_token': '{{ csrf_token() }}'
-                        },
-                        success: function(data) {
-                            // console.log(data);
-                            if (data.status) {
-                                let newDivContent =
-                                    `<div class="conversations-sender conversations">${data.message}</p></div>
-                                    <div class="message-time">${data.time}</div>`;
-                                newDiv.html(newDivContent);
-                                chatsDiv.append(newDiv);
-                                scrollToBottom();
-                                $('#type-message').val('');
-                            } else {
-                                Swal.fire({
-                                    title: 'Something went wrong please try again letter or refresh the page.',
-                                    icon: 'error',
-                                    confirmButtonText: 'OK'
-                                });
-                            }
-                        }
-                    });
-                } else {
-                    // console.log('spaces');
-                }
-
-            });
-            //----------- send message ---------//
-
-
             // ------------------ static search users -------------------- //
 
 
@@ -1111,40 +662,6 @@
 
 
             // ------------------------ ADD NEW USER ------------------//
-
-            // $('.add-new-connections').on('click', function() {
-            //     Swal.fire({
-            //         title: 'Request',
-            //         input: 'text',
-            //         inputPlaceholder: 'Type something...',
-            //         showCancelButton: true,
-            //         confirmButtonText: 'Request',
-            //         cancelButtonText: 'Cancel',
-            //         showLoaderOnConfirm: true,
-            //         preConfirm: (inputValue) => {
-            //             // Handle the input value (you can send a request here)
-            //             return new Promise((resolve) => {
-            //                 setTimeout(() => {
-            //                     if (!inputValue) {
-            //                         Swal.showValidationMessage(
-            //                             'Please enter something');
-            //                     }
-            //                     resolve(inputValue);
-            //                 }, 1000);
-            //             });
-            //         },
-            //         allowOutsideClick: () => !Swal.isLoading()
-            //     }).then((result) => {
-            //         if (result.isConfirmed) {
-            //             Swal.fire({
-            //                 title: 'Success!',
-            //                 text: `You entered: ${result.value}`,
-            //                 icon: 'success',
-            //                 confirmButtonText: 'OK'
-            //             });
-            //         }
-            //     });
-            // });
 
             $('.add-new-connections').on('click', function() {
                 $('#request-user-id').val('').trigger('input');
@@ -1319,6 +836,7 @@
             //------------------ accept reject action ------------------//
 
 
+            /*
             setInterval(() => {
                 var currentChatId = $('#send-the-msg').data('id');
                 // console.log(currentChatId);
@@ -1339,9 +857,133 @@
                     });
                 }
             }, 1000);
+            */
 
             // ---------------------- check For new message every 500 milisecond ---------------------- //
 
+
+            // -----------------  pusher  -------------------//
+
+            // Pusher.logToConsole = true;
+            var pusher = new Pusher('6dacd9cce718ed0e43e0', {
+                cluster: 'ap2'
+            });
+
+            var channelForConversation = pusher.subscribe('privet');
+
+
+
+            // -----------------  pusher  -------------------// 
+
+            //----------- send message ---------//
+            $('#send-the-msg').on('click', function() {
+                $('.no-conv').css('display', 'none');
+                let chatsDiv = $('#chats');
+                let message = $('#type-message').val().trim();
+                // $('#type-message').val('');
+                let id = $(this).data('id');
+                // console.log(message);
+
+                if (id != '' && message !== '') {
+                    var newDiv = $('<div>', {
+                        'class': 'parent-conv sender'
+                    });
+
+                    $.ajax({
+                        url: "{{ route('send-messasge') }}",
+                        type: 'POST',
+                        headers: {
+                            'X-Socket-Id': pusher.connection.socket_id
+                        },
+                        data: {
+                            id: id,
+                            message: message,
+                            '_token': '{{ csrf_token() }}'
+                        },
+                        success: function(data) {
+                            // console.log(data);
+                            if (data.status) {
+                                let newDivContent =
+                                    `<div class="conversations-sender conversations">${data.message}</p></div>
+                <div class="message-time">${data.time}</div>`;
+                                newDiv.html(newDivContent);
+                                chatsDiv.append(newDiv);
+                                scrollToBottom();
+                                $('#type-message').val('');
+                            } else {
+                                Swal.fire({
+                                    title: 'Something went wrong please try again letter or refresh the page.',
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        }
+                    });
+                } else {
+                    // console.log('spaces');
+                }
+
+            });
+            //----------- send message ---------//
+
+            // --------------------------------  Dynamically get the chats ----------------------------------------//
+            let previousbind = '';
+            let isFirst = true;
+            let eventName = '';
+            let realChatHtml = '';
+            $(document).on('click', '#added-lists .indivisual-user', function(e) {
+                // console.log('ab ayega maaza');
+                let username = $(this).data('username');
+                let id = $(this).data('id');
+                $.ajax({
+                    url: "{{ route('get-message', ['id' => ':id', 'username' => ':username']) }}"
+                        .replace(':id', id)
+                        .replace(':username', username),
+                    type: 'GET',
+                    success: function(data) {
+                        var chatsSecD = $('#chats');
+                        chatsSecD.css('scroll-behavior', 'auto');
+                        $('#chats').html(data.html);
+                        $('#send-the-msg').data('id', id);
+                        var chatsSecD = $('#chats');
+                        chatsSecD.scrollTop(chatsSecD.prop('scrollHeight'));
+                        chatsSecD.css('scroll-behavior', 'smooth');
+                        $('.inner-rightbar-cover').css('display', 'none');
+
+                        var connectionId = data.connectionId;
+                        changeChannel(connectionId);
+                    }
+                });
+            });
+
+            function changeChannel(id) {
+                if (isFirst) {
+                    isFirst = false;
+                    previousbind = 'chats-' + id;
+                } else {
+                    channelForConversation.unbind(previousbind);
+                    previousbind = 'chats-' + id;
+                }
+
+                channelForConversation.bind('chats-' + id, function(data) {
+
+                    realChatHtml = `
+                    <div class="parent-conv reciever">
+                        <div class="conversations-reciever conversations">
+                            ` + data.message + `
+                        </div>
+                        <div class="message-time">` + data.formattedTime + `</div>
+                    </div>
+                    `;
+                    $('#chats').append(realChatHtml);
+                    scrollToBottom();
+                    // alert(JSON.stringify(data));
+                });
+
+                // alert(channelForConversation);
+            }
+
+            // --------------------------------  Dynamically get the chats ----------------------------------------// 
         });
 
         // -----------------------------------------responsive js ----------------------------------------------//
@@ -1414,35 +1056,6 @@
         }
     </script>
 
-    <script>
-        // --------------------------------  Dynamically get the chats ----------------------------------------//
-
-        $(document).on('click', '#added-lists .indivisual-user', function(e) {
-            // console.log('ab ayega maaza');
-            let username = $(this).data('username');
-            let id = $(this).data('id');
-            $.ajax({
-                url: "{{ route('get-message', ['id' => ':id', 'username' => ':username']) }}"
-                    .replace(':id', id)
-                    .replace(':username', username),
-                type: 'GET',
-                success: function(data) {
-                    var chatsSecD = $('#chats');
-                    chatsSecD.css('scroll-behavior', 'auto');
-                    $('#chats').html(data);
-                    $('#send-the-msg').data('id', id);
-                    var chatsSecD = $('#chats');
-                    chatsSecD.scrollTop(chatsSecD.prop('scrollHeight'));
-                    chatsSecD.css('scroll-behavior', 'smooth');
-                    $('.inner-rightbar-cover').css('display', 'none');
-                }
-            });
-        });
-
-        // --------------------------------  Dynamically get the chats ----------------------------------------// 
-    </script>
-
-
     {{-- -------------------- emoji script  ------------------- --}}
     <script type="module">
         document.addEventListener('emoji-click', (event) => {
@@ -1465,18 +1078,6 @@
         }
     </script>
     {{-- -------------------- emoji script  ------------------- --}}
-
-
-    {{-- Perform clicks by link --}}
-    <script>
-        // var fragment = window.location.hash;
-        // if (fragment === '#request') {
-        //     $('.tabs-a').trigger('click');
-        // } else {
-        //     console.log('Fragment is ' + fragment);
-        // }
-    </script>
-
 </body>
 
 </html>

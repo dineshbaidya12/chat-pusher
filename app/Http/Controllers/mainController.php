@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PusherBroadcast;
 use App\Models\Connection as ConnectionModel;
 use App\Models\Message;
 use App\Models\User;
@@ -67,29 +68,13 @@ class mainController extends Controller
             ->get();
 
         // dd($requestsLists->toArray());
-        return view('home', compact('connections', 'requestsLists'));
+        return view('home', compact('connections', 'requestsLists', 'authUser'));
     }
-
-    // public function sendMsg(Request $request)
-    // {
-    //     $cleanContent = Purifier::clean($request->input('type_message'));
-    //     $contentWithLineBreaks = nl2br($cleanContent);
-    //     dd($contentWithLineBreaks);
-    // }
-
-    // public function userChats($username)
-    // {
-    //     try {
-    //         $authUser = Auth::user();
-    //     } catch (\Exception $err) {
-    //         return redirect()->back()->with('error', 'Something went wrong. ' . $err);
-    //     }
-    // }
 
     public function getMessage($id, $username)
     {
         try {
-            if ($id == 0) {
+            if ($id == 0 || $id == '') {
                 return response()->json(['status' => false, 'message' => 'Something went wrong.']);
             }
             $authUser = Auth::user();
@@ -127,7 +112,14 @@ class mainController extends Controller
             }
             $otherPersoneId = $otherPersoDetails->id;
 
-            return view('chats', compact('messages', 'otherPersoneName', 'otherPersonImage', 'otherPersoneId'));
+            $connectionId = $this->connectionId($otherPersoneId,  $authUserId);
+
+            $response = [
+                'html' => view('chats', compact('messages', 'otherPersoneName', 'otherPersonImage', 'otherPersoneId', 'connectionId'))->render(),
+                'connectionId' => $connectionId,
+            ];
+
+            return response()->json($response);
         } catch (\Exception $err) {
             return response()->json(['status' => false, 'message' => 'Something went wrong ' . $err]);
         }
@@ -136,7 +128,6 @@ class mainController extends Controller
     public function SendMessageAjax(Request $request)
     {
         try {
-
             $rules = [
                 'id' => 'required|numeric',
                 'message' => 'required'
@@ -171,6 +162,9 @@ class mainController extends Controller
                 $connection = ConnectionModel::where('id', $connectionId)->first();
                 $connection->last_message = $msgId;
                 $connection->update();
+                $id = $connectionId;
+                $formattedTime = $now->format('h:iA');
+                broadcast(new PusherBroadcast($message, $id, $formattedTime))->toOthers();
             } catch (\Exception $err) {
                 dd($err);
             }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController as DefaultLoginController;
 use App\Http\Controllers\loginController as LoginController;
 use App\Http\Controllers\mainController as MainController;
+use App\Http\Controllers\PusherController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 

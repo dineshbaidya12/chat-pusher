@@ -1,0 +1,192 @@
+<div class="parent-conv reciever">
+    <div class="conversations-reciever conversations">
+        <p>
+            Lorem Ipsum Doller si
+        </p>
+    </div>
+    <div class="message-time">12:50</div>
+</div>
+
+<div class="conversation-time">
+    <p>Today</p>
+</div>
+
+<div class="parent-conv reciever">
+    <div class="conversations-reciever conversations">
+        <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, dicta
+            reprehenderit delectus accusamus reiciendis vero sint dolorum impedit
+            atque
+            quod labore voluptates asperiores commodi qui quibusdam alias, amet
+            exercitationem. Dolores.
+        </p>
+    </div>
+    <div class="message-time">19:06</div>
+</div>
+
+<div class="spacer-10"></div>
+
+<div class="parent-conv sender">
+    <div class="conversations-sender conversations">
+        <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, dicta
+            reprehenderit delectus accusamus reiciendis vero sint dolorum impedit
+            atque
+            quod labore voluptates asperiores commodi qui quibusdam alias, amet
+            exercitationem. Dolores.
+        </p>
+    </div>
+    <div class="message-time">19:06</div>
+</div>
+
+<div class="parent-conv sender">
+    <div class="conversations-sender conversations">
+        <p>
+            Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+        </p>
+    </div>
+    <div class="message-time">19:06</div>
+</div>
+
+<div class="parent-conv sender">
+    <div class="conversations-sender conversations">
+        <p id="long-p">
+            Lorem ipsum dolor sit amet.
+        </p>
+    </div>
+    <div class="message-time">19:06</div>
+</div>
+
+<div class="parent-conv sender">
+    <div class="conversations-sender conversations">
+        <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque, illo
+            obcaecati cum doloribus debitis error.
+        </p>
+    </div>
+    <div class="message-time">19:06</div>
+</div>
+
+<div class="spacer-10"></div>
+
+<div class="parent-conv reciever">
+    <div class="conversations-reciever conversations">
+        <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam dolorum
+            aperiam sapiente?
+        </p>
+    </div>
+    <div class="message-time">19:06</div>
+</div>
+
+<div class="conversation-time">
+    <p>12th Dec, 2023</p>
+</div>
+
+<div class="parent-conv reciever">
+    <div class="conversations-reciever conversations">
+        <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure voluptatem
+            adipisci fuga numquam sed ut nam tempora iste dicta a ad ipsum fugiat,
+            soluta unde eos debitis aut cupiditate. Corrupti.
+        </p>
+    </div>
+    <div class="message-time">19:06</div>
+</div>
+
+
+<div class="parent-conv reciever">
+    <div class="conversations-reciever conversations">
+        <p>
+            Lorem Ipsum Doller si
+        </p>
+    </div>
+    <div class="message-time">12:50</div>
+</div>
+
+<div class="conversation-time">
+    <p>Today</p>
+</div>
+
+<div class="parent-conv reciever">
+    <div class="conversations-reciever conversations">
+        <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, dicta
+            reprehenderit delectus accusamus reiciendis vero sint dolorum impedit
+            atque
+            quod labore voluptates asperiores commodi qui quibusdam alias, amet
+            exercitationem. Dolores.
+        </p>
+    </div>
+    <div class="message-time">19:06</div>
+</div>
+
+<div class="spacer-10"></div>
+
+<div class="parent-conv sender">
+    <div class="conversations-sender conversations">
+        <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut, dicta
+            reprehenderit delectus accusamus reiciendis vero sint dolorum impedit
+            atque
+            quod labore voluptates asperiores commodi qui quibusdam alias, amet
+            exercitationem. Dolores.
+        </p>
+    </div>
+    <div class="message-time">19:06</div>
+</div>
+
+<div class="parent-conv sender">
+    <div class="conversations-sender conversations">
+        <p>
+            Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+        </p>
+    </div>
+    <div class="message-time">19:06</div>
+</div>
+
+<div class="parent-conv sender">
+    <div class="conversations-sender conversations">
+        <p id="long-p">
+            Lorem ipsum dolor sit amet.
+        </p>
+    </div>
+    <div class="message-time">19:06</div>
+</div>
+
+<div class="parent-conv sender">
+    <div class="conversations-sender conversations">
+        <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque, illo
+            obcaecati cum doloribus debitis error.
+        </p>
+    </div>
+    <div class="message-time">19:06</div>
+</div>
+
+<div class="spacer-10"></div>
+
+<div class="parent-conv reciever">
+    <div class="conversations-reciever conversations">
+        <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam dolorum
+            aperiam sapiente?
+        </p>
+    </div>
+    <div class="message-time">19:06</div>
+</div>
+
+<div class="conversation-time">
+    <p>12th Dec, 2023</p>
+</div>
+
+<div class="parent-conv reciever">
+    <div class="conversations-reciever conversations">
+        <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure voluptatem
+            adipisci fuga numquam sed ut nam tempora iste dicta a ad ipsum fugiat,
+            soluta unde eos debitis aut cupiditate. Corrupti.
+        </p>
+    </div>
+    <div class="message-time">19:06</div>
+</div>

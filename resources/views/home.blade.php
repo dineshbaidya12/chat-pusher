@@ -72,6 +72,9 @@
                             </div>
                             <ul class="position-absolute more-option-left" id="more-option-left">
                                 <a href="#">
+                                    <li>{{ $authUser->name }}</li>
+                                </a>
+                                <a href="#">
                                     <li>View Profile</li>
                                 </a>
                                 <a href="{{ route('logout') }}">
@@ -118,9 +121,9 @@
                                                 <p class="margin-0">
                                                     @php
                                                         if (count($requestsLists) > 0) {
-                                                            echo 'Request(' . count($requestsLists) . ')';
+                                                            echo 'Request<span id="count-req-conn">' . (count($requestsLists) > 9 ? '9+' : count($requestsLists)) . '</span>';
                                                         } else {
-                                                            echo 'Request';
+                                                            echo 'Request<span id="count-req-conn" style="display:none;"></span>';
                                                         }
                                                     @endphp
                                                 </p>
@@ -220,7 +223,7 @@
                                                         <span class="separtor"></span>
                                                     @endforeach
                                                 @else
-                                                    <p>No Connections</p>
+                                                    <p id="no-connection-p">No Connections</p>
                                                 @endif
 
                                             </div>
@@ -412,17 +415,15 @@
                 </div>
                 <div class="modal-body">
                     <!-- Your form content goes here -->
-                    <form>
-                        <div class="form-group position-relative" id="request-username">
-                            <label for="request-user-type">Username</label>
-                            <input type="text" class="form-control" id="request-user-type"
-                                placeholder="testing.web017" autocomplete="off" name="request-the-db">
-                            <ul id="suggetion-container">
-                            </ul>
-                        </div>
-                        <input type="hidden" id="request-user-id" name="request_user_id" value=""
-                            style="color:black;">
-                    </form>
+                    <div class="form-group position-relative" id="request-username">
+                        <label for="request-user-type">Username</label>
+                        <input type="text" class="form-control" id="request-user-type"
+                            placeholder="testing.web017" autocomplete="off" name="request-the-db">
+                        <ul id="suggetion-container">
+                        </ul>
+                    </div>
+                    <input type="hidden" id="request-user-id" name="request_user_id" value=""
+                        style="color:black;">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -815,10 +816,20 @@
                                             '.indivisual-user');
                                         indivisualUser.next('.separtor').hide();
                                         indivisualUser.hide();
-                                        $('#added-lists .col-12').append(data.data
-                                            .htmlStructure);
-                                        $('#added-lists .col-12 p:first').hide();
-                                        handleScreenSizeChange();
+                                        if (data.accept) {
+                                            $('#added-lists .col-12').append(data.data
+                                                .htmlStructure);
+                                            $('#no-connection-p').hide();
+                                            handleScreenSizeChange();
+                                        }
+                                        if (data.data.countreq == 0) {
+                                            $('#count-req-conn').css('display', 'none');
+                                        } else if (data.data.countreq > 9) {
+                                            $('#count-req-conn').text("9+");
+                                        } else {
+                                            $('#count-req-conn').text(data.data
+                                                .countreq);
+                                        }
                                     } else {
                                         Swal.fire({
                                             title: data.message,
@@ -1021,21 +1032,27 @@
                 if ($('#send-the-msg').data('conv-id') != data.convId) {
                     $('#user-unread-' + data.convId).text(data.unreadMsg);
                     $('#user-unread-' + data.convId).css('display', 'block');
+                } else {
+                    $.ajax({
+                        type: 'GET',
+                        url: `{{ url('seen-msg/') }}/${data.msgId}`,
+                    });
                 }
-
-                $.ajax({
-                    type: 'GET',
-                    url: `{{ url('seen-msg/') }}/${data.msgId}`,
-                    success: function(data) {
-                        console.log(data);
-                    }
-                });
             });
-
-            console.log(channelForLeftBarConv);
 
 
             // --------------------- Realtime Leftbar Notification ------------------------// 
+
+            // --------------------- Friend Request Notification ------------------------//
+
+            var channelForFriendRequest = pusher.subscribe('friend-request');
+
+            channelForFriendRequest.bind('theuser-' + {{ $authUser->id }}, function(data) {
+                alert(JSON.stringify(data));
+            });
+
+
+            // --------------------- Friend Request Notification ------------------------// 
 
             // This is end of Document ready
         });

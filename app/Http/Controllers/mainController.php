@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\LeftBarBrodacast;
 use App\Events\PusherBroadcast;
+use App\Events\SendFriendRequest;
 use App\Models\Connection as ConnectionModel;
 use App\Models\Message;
 use App\Models\User;
@@ -208,9 +209,12 @@ class mainController extends Controller
                 return response()->json(['status' => true, 'message' => '']);
             }
             $authUser = Auth::user();
-            $users = User::where('username', 'like', '%' . $username . '%')->orWhere('name', 'like', '%' . $username . '%')->where('status', 'active')->where('type', 'user')->whereNotIn('id', [$authUser->id])->select('id', 'name', 'username', 'profile_pic')->limit(50)->get();
+            $users = User::where('username', 'like', '%' . $username . '%')->orWhere('name', 'like', '%' . $username . '%')->where('status', 'active')->where('type', 'user')->select('id', 'name', 'username', 'profile_pic')->limit(50)->get();
             $response = '';
             foreach ($users as $user) {
+                if ($user->id == $authUser->id) {
+                    continue;
+                }
                 $profilePic = '';
                 if ($user->profile_pic != '') {
                     $profilePic = asset('user_profile_picture/thumb/' . $user->profile_pic);
@@ -280,6 +284,7 @@ class mainController extends Controller
             $connection->status = 'requested';
             $connection->requested_by = $authUser->id;
             $connection->save();
+            broadcast(new SendFriendRequest($id))->toOthers();
             return response()->json(['status' => true, 'message' => 'Connection request send to ' . $user->name . ' (' . $user->username . ')']);
         } catch (\Exception $err) {
             return response()->json(['status' => false, 'message' => $err]);
@@ -301,6 +306,7 @@ class mainController extends Controller
             }
 
             $authUser = Auth::user();
+            $authId = $authUser->id;
 
             $connection = ConnectionModel::find($request->id);
             if (!$connection) {
@@ -341,15 +347,28 @@ class mainController extends Controller
                         </div>
                     </div>
                     ';
-                    return response()->json(['status' => true, 'message' => "Connection request accepted succesfully", 'data' => ['htmlStructure' => $htmlStructureAdded]]);
+                    $countReq = ConnectionModel::where(function ($query) use ($authId) {
+                        $query->where('first_user', $authId)
+                            ->orWhere('second_user', $authId);
+                    })
+                        ->where('requested_by', '!=', $authId)
+                        ->count();
+                    return response()->json(['status' => true, 'accept' => true, 'message' => "Connection request accepted succesfully", 'data' => ['htmlStructure' => $htmlStructureAdded, 'countreq' => $countReq]]);
                 } else {
                     $connection->delete();
-                    return response()->json(['status' => true, 'message' => "Connection request rejected succesfully"]);
+                    $countReq = ConnectionModel::where(function ($query) use ($authId) {
+                        $query->where('first_user', $authId)
+                            ->orWhere('second_user', $authId);
+                    })
+                        ->where('requested_by', '!=', $authId)
+                        ->count();
+                    return response()->json(['status' => true, 'accept' => false, 'message' => "Connection request rejected succesfully", 'data' => ['countreq' => $countReq]]);
                 }
             } else {
                 return response()->json(['status' => false, 'message' => "You don't have access to that connection"]);
             }
         } catch (\Exception $err) {
+            // dd($err);
             return response()->json(['status' => false, 'message' => 'Something went wrong.']);
         }
     }

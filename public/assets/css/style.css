@@ -584,7 +584,7 @@ hr {
 }
 
 /* .small-right-bar {
-    
+    transform: translateX(-15%);
 } */
 
 .emoji-btn {
@@ -853,6 +853,21 @@ emoji-picker {
     background: #f4f4f4;
 }
 
+#count-req-conn {
+    background: red;
+    padding: 0px 5px;
+    padding-top: 0px;
+    border-radius: 50%;
+    font-size: 12px;
+    height: 20px;
+    width: 20px;
+    display: inline-block;
+    text-align: center;
+    margin-left: 6px;
+    vertical-align: top;
+    margin-top: 3px;
+    padding-top: 2px;
+}
 
 
 
@@ -937,11 +952,22 @@ emoji-picker {
     .go-back-cont {
         display: block;
     }
+
+    .users-list {
+        transform: translateX(1.2%);
+    }
 }
 
 @media (max-width: 420px) {
     .unread-msg-count {
         right: 15%;
+    }
+}
+
+@media (max-width: 374px) {
+    .req-action {
+        transform: translateX(-15%);
+        gap: 0px;
     }
 }
 
@@ -952,7 +978,6 @@ emoji-picker {
         width: 89%;
     }
 }
-
 
 @media(min-width:580px) and (max-width:680px) {
     #type-message {
@@ -1025,5 +1050,11 @@ emoji-picker {
         --num-columns: 8;
         --emoji-size: 1.5rem;
         --background: #202124;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width: 1200px) {
+    .req-action {
+        gap: 5px;
     }
 }

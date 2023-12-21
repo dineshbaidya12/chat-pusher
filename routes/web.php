@@ -35,4 +35,5 @@ Route::group(['middleware' => 'checkUserLoggedIn'], function () {
     Route::get('/search-user/{username}', [MainController::class, 'searchUser'])->name('search-user');
     Route::post('/send-request', [MainController::class, 'sendRequest'])->name('send-request');
     Route::post('/accept-reject-request', [MainController::class, 'acceptRejectRequest'])->name('accept-reject-request');
+    Route::get('/seen-msg/{id}', [MainController::class, 'seenMsg'])->name('seen-msg');
 });

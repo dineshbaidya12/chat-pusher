@@ -456,12 +456,12 @@ hr {
 
 .conversations-reciever {
     display: inline-block;
-    background: #8dff83;
+    background: white;
     border-radius: 0px 8px 8px 8px;
 }
 
 .conversations-sender {
-    background: white;
+    background: #8dff83;
     margin-left: auto;
     display: block;
     border-radius: 8px 0px 8px 8px;
@@ -583,9 +583,9 @@ hr {
     background: #ffa4a48c;
 }
 
-.small-right-bar {
-    /* display: none; */
-}
+/* .small-right-bar {
+    
+} */
 
 .emoji-btn {
     top: 19px;
@@ -830,6 +830,30 @@ emoji-picker {
     height: 97vh;
 }
 
+.unread-msg-count {
+    position: absolute;
+    right: 25px;
+    bottom: 30%;
+    padding: 4px 5px;
+    background: #305e30;
+    border-radius: 50%;
+    text-align: center;
+    font-family: var(--primary-heading);
+    font-size: 10px;
+    min-width: 23px;
+    display: none;
+}
+
+
+#more-option-left a {
+    text-decoration: none !important;
+}
+
+#more-option-left li:hover {
+    background: #f4f4f4;
+}
+
+
 
 
 
@@ -912,6 +936,12 @@ emoji-picker {
 
     .go-back-cont {
         display: block;
+    }
+}
+
+@media (max-width: 420px) {
+    .unread-msg-count {
+        right: 15%;
     }
 }
 

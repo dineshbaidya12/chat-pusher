@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\LeftBarBrodacast;
 use App\Events\PusherBroadcast;
 use App\Models\Connection as ConnectionModel;
 use App\Models\Message;
@@ -98,7 +99,7 @@ class mainController extends Controller
                 ->orderBy('time', 'ASC')
                 ->get();
 
-            Message::where('reciever', $authUserId)->where('status', 'unseen')->update(['status' => 'seen']);
+            Message::where('reciever', $authUserId)->where('sender', $id)->where('status', 'unseen')->update(['status' => 'seen']);
 
             $otherPersoDetails = User::where('id', $id)->select('id', 'name', 'profile_pic')->first();
             // dd($otherPersoDetails->toArray());
@@ -164,7 +165,10 @@ class mainController extends Controller
                 $connection->update();
                 $id = $connectionId;
                 $formattedTime = $now->format('h:iA');
+                $unreadMsg = DB::table('messages')->where('sender', $authUser->id)->where('reciever', $request->id)->where('status', 'unseen')->count();
+                $unreadMsg = $unreadMsg > 9 ? '9+' : $unreadMsg;
                 broadcast(new PusherBroadcast($message, $id, $formattedTime))->toOthers();
+                broadcast(new LeftBarBrodacast($request->id, $id, $message, $unreadMsg, $msgId))->toOthers();
             } catch (\Exception $err) {
                 dd($err);
             }
@@ -348,5 +352,19 @@ class mainController extends Controller
         } catch (\Exception $err) {
             return response()->json(['status' => false, 'message' => 'Something went wrong.']);
         }
+    }
+
+    public function seenMsg($id)
+    {
+        $msg = Message::find($id);
+        if ($msg) {
+            if ($msg->status == 'unseen') {
+                $msg->status = 'seen';
+                $msg->update();
+                return 'seen';
+            }
+            return 'diff status';
+        }
+        return 'no msg';
     }
 }

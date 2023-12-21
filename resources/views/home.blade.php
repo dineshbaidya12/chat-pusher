@@ -165,7 +165,8 @@
                                                                         alt="Lorem Ipsum" class="users-dp">
                                                                 @endif
                                                             </div>
-                                                            <div class="user-details-div col-9">
+                                                            <div class="user-details-div col-9"
+                                                                id="user-details-{{ $conn->id }}">
                                                                 <p class="m-0 user-name">
                                                                     {{ $name ?? 'Server Issue' }}
                                                                 </p>
@@ -181,7 +182,8 @@
                                                                             ];
                                                                         }
                                                                     @endphp
-                                                                    <p class="m-0 message-details">
+                                                                    <p class="m-0 message-details"
+                                                                        id="conv-{{ $conn->id }}">
                                                                         @if ($lastMessageDetails->sender == auth()->user()->id && $lastMessageDetails->status == 'unseen')
                                                                             <img src="{{ asset('assets/images/dummy-imgs/tick.png') }}"
                                                                                 alt="tick"
@@ -201,12 +203,18 @@
                                                                         @endif
                                                                     </p>
                                                                 @else
-                                                                    <p class="m-0 message-details">
+                                                                    <p class="m-0 message-details"
+                                                                        id="conv-{{ $conn->id }}">
                                                                         <span style="color:grey;">No Conversation
                                                                             Yet</span>
                                                                     </p>
                                                                 @endif
-
+                                                                @php
+                                                                    $unreadCount = app('App\Http\Controllers\controller')->countUnreedMsg($connectedUserId, $authUser->id);
+                                                                @endphp
+                                                                <span class="unread-msg-count"
+                                                                    id="user-unread-{{ $conn->id }}"
+                                                                    style="{{ $unreadCount == 0 ? '' : 'display:block;' }}">{{ $unreadCount }}</span>
                                                             </div>
                                                         </div>
                                                         <span class="separtor"></span>
@@ -374,7 +382,7 @@
                                     </form>
                                     <div class="send-msg-btn">
                                         <img src="{{ asset('assets/images/dummy-imgs/send.png') }}" alt="send"
-                                            class="cursor-pointer" id="send-the-msg" data-id="">
+                                            class="cursor-pointer" id="send-the-msg" data-id="" data-conv-id="">
                                     </div>
                                 </div>
                             </div>
@@ -451,6 +459,7 @@
     <script src="{{ asset('assets/js/script.js') }}"></script>
     <script>
         $(document).ready(function() {
+            let smallScreen;
             $('.preloader').css('display', 'none');
             // console.log(channel);
 
@@ -876,19 +885,38 @@
             // -----------------  pusher  -------------------// 
 
             //----------- send message ---------//
+
+
+
             $('#send-the-msg').on('click', function() {
                 $('.no-conv').css('display', 'none');
                 let chatsDiv = $('#chats');
                 let message = $('#type-message').val().trim();
                 // $('#type-message').val('');
                 let id = $(this).data('id');
-                // console.log(message);
+                let convId = $(this).data('conv-id');
+                // console.log(convId);
+                var newDiv = $('<div>', {
+                    'class': 'parent-conv sender'
+                });
+                let messageWithoutHTML = $('<div>').html(message).text();
+                let formattedTime = new Date().toLocaleString('en-US', {
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
+                });
+                $('#conv-' + convId).html(
+                    `<img class="status-unread" src="{{ asset('assets/images/dummy-imgs/tick.png') }}">` +
+                    messageWithoutHTML.substring(0, 25));
+                let newDivContent =
+                    `<div class="conversations-sender conversations"><p>${messageWithoutHTML}</p></div>
+                <div class="message-time">${formattedTime}</div>`;
+                newDiv.html(newDivContent);
+                chatsDiv.append(newDiv);
+                scrollToBottom();
+                $('#type-message').val('');
 
                 if (id != '' && message !== '') {
-                    var newDiv = $('<div>', {
-                        'class': 'parent-conv sender'
-                    });
-
                     $.ajax({
                         url: "{{ route('send-messasge') }}",
                         type: 'POST',
@@ -902,15 +930,7 @@
                         },
                         success: function(data) {
                             // console.log(data);
-                            if (data.status) {
-                                let newDivContent =
-                                    `<div class="conversations-sender conversations">${data.message}</p></div>
-                <div class="message-time">${data.time}</div>`;
-                                newDiv.html(newDivContent);
-                                chatsDiv.append(newDiv);
-                                scrollToBottom();
-                                $('#type-message').val('');
-                            } else {
+                            if (!data.status) {
                                 Swal.fire({
                                     title: 'Something went wrong please try again letter or refresh the page.',
                                     icon: 'error',
@@ -933,6 +953,7 @@
             let realChatHtml = '';
             $(document).on('click', '#added-lists .indivisual-user', function(e) {
                 // console.log('ab ayega maaza');
+                let countSpan = $(this).find('.unread-msg-count');
                 let username = $(this).data('username');
                 let id = $(this).data('id');
                 $.ajax({
@@ -949,9 +970,14 @@
                         chatsSecD.scrollTop(chatsSecD.prop('scrollHeight'));
                         chatsSecD.css('scroll-behavior', 'smooth');
                         $('.inner-rightbar-cover').css('display', 'none');
-
                         var connectionId = data.connectionId;
                         changeChannel(connectionId);
+                        $('#send-the-msg').data('conv-id', connectionId);
+                        $('#type-message').focus();
+                        $('.small-left-bar').css('display', 'none');
+                        $('.small-right-bar').css('display', 'block');
+                        countSpan.css('display', 'none');
+                        countSpan.text('');
                     }
                 });
             });
@@ -984,6 +1010,34 @@
             }
 
             // --------------------------------  Dynamically get the chats ----------------------------------------// 
+
+            // --------------------- Realtime Leftbar Notification ------------------------//
+
+            var channelForLeftBarConv = pusher.subscribe('public');
+
+            channelForLeftBarConv.bind('conv-' + {{ $authUser->id }}, function(data) {
+                let message = $('<div>').html(data.message).text().substring(0, 25);
+                $('#conv-' + data.convId).html(message);
+                if ($('#send-the-msg').data('conv-id') != data.convId) {
+                    $('#user-unread-' + data.convId).text(data.unreadMsg);
+                    $('#user-unread-' + data.convId).css('display', 'block');
+                }
+
+                $.ajax({
+                    type: 'GET',
+                    url: `{{ url('seen-msg/') }}/${data.msgId}`,
+                    success: function(data) {
+                        console.log(data);
+                    }
+                });
+            });
+
+            console.log(channelForLeftBarConv);
+
+
+            // --------------------- Realtime Leftbar Notification ------------------------// 
+
+            // This is end of Document ready
         });
 
         // -----------------------------------------responsive js ----------------------------------------------//
@@ -996,6 +1050,7 @@
             let chatsLists = document.getElementById('added-lists').querySelectorAll('.indivisual-user');
             if (smallScreenMediaQuery.matches) {
                 // console.log('less than 767px');
+                smallScreen = true;
                 chatsLists.forEach(element => {
                     element.classList.add('small-screen-added-lists');
                 });
@@ -1004,6 +1059,7 @@
                 $('.small-right-bar').css('display', 'none');
             } else {
                 // console.log('not less than 767px');
+                smallScreen = false;
                 chatsLists.forEach(element => {
                     element.classList.remove('small-screen-added-lists');
                 });
@@ -1019,11 +1075,11 @@
         //-------window size
 
 
-        $(document).on('click', '.small-screen-added-lists', function() {
-            $('#type-message').focus();
-            $('.small-left-bar').css('display', 'none');
-            $('.small-right-bar').css('display', 'block');
-        });
+        // $(document).on('click', '.small-screen-added-lists', function() {
+        //     $('#type-message').focus();
+        //     $('.small-left-bar').css('display', 'none');
+        //     $('.small-right-bar').css('display', 'block');
+        // });
         let emojiDivShown = false;
         $('.emoji-btn').on('click', function() {
             $('#type-message').focus();
@@ -1078,6 +1134,21 @@
         }
     </script>
     {{-- -------------------- emoji script  ------------------- --}}
+
+    {{-- -------------------- shortcuts and click event ---------------- --}}
+    <script>
+        $(document).keydown(function(event) {
+            if (event.ctrlKey && event.key === "e") {
+                event.preventDefault();
+                $('.emoji-btn').click();
+            }
+            if (event.ctrlKey && event.key === "s") {
+                event.preventDefault();
+                $('#search-user').click();
+            }
+        });
+    </script>
+    {{-- -------------------- shortcuts and click event ---------------- --}}
 </body>
 
 </html>

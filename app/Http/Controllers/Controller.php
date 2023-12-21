@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class Controller extends BaseController
@@ -43,6 +44,16 @@ class Controller extends BaseController
             return "$days day" . ($days > 1 ? 's' : '') . ' ago';
         } else {
             return $timestamp->format('Y-m-d H:i:s');
+        }
+    }
+
+    function countUnreedMsg($sender, $reciever)
+    {
+        $count = DB::table('messages')->where('sender', $sender)->where('reciever', $reciever)->where('status', 'unseen')->count();
+        if ($count) {
+            return $count;
+        } else {
+            return 0;
         }
     }
 }

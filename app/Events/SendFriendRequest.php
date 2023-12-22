@@ -16,16 +16,22 @@ class SendFriendRequest implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public int $id;
+    public int $reqSenderId;
+    public int $connectionId;
+    public int $countReq;
     public string $type = 'friendrequest';
     public object $userDetails;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(int $id)
+    public function __construct(int $id, int $reqSenderId, int $countReq, int $connectionId)
     {
         $this->id = $id;
-        $this->userDetails = User::where('id', $id)->select('id', 'name', 'username', 'profile_pic')->first();
+        $this->connectionId = $connectionId;
+        $this->countReq = $countReq;
+        $this->reqSenderId = $reqSenderId;
+        $this->userDetails = User::where('id', $reqSenderId)->select('id', 'name', 'username', 'profile_pic')->first();
     }
 
     /**

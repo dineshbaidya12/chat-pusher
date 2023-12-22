@@ -728,6 +728,8 @@
                 let id = $('#request-user-id').val();
                 // console.log(id);
                 if (id != '' && id != 0) {
+                    $('#request-connection').css('pointer-events', 'none');
+                    $('#request-connection').text('Please Wait...');
                     $.ajax({
                         url: "{{ route('send-request') }}",
                         type: 'POST',
@@ -751,6 +753,12 @@
                                     confirmButtonText: 'OK'
                                 });
                             }
+                            $('#request-connection').css('pointer-events', 'auto');
+                            $('#request-connection').text('Request');
+                        },
+                        error: function(data) {
+                            $('#request-connection').css('pointer-events', 'auto');
+                            $('#request-connection').text('Request');
                         }
                     });
                 }
@@ -762,7 +770,7 @@
 
             //------------------ request username slide ------------------//
 
-            $('.user-name').click(function() {
+            $(document).on('click', '.user-name', function() {
                 var $this = $(this);
                 var currentScrollLeft = $this.scrollLeft();
 
@@ -780,7 +788,7 @@
             //------------------ accept reject action ------------------//
 
 
-            $('.req-action-btn').on('click', function() {
+            $(document).on('click', '.req-action-btn', function() {
                 let id = $(this).data('id');
                 let action = $(this).data('action');
                 let username = $(this).data('username');
@@ -823,6 +831,7 @@
                                             handleScreenSizeChange();
                                         }
                                         if (data.data.countreq == 0) {
+                                            $('.no-requests').css('display', 'flex');
                                             $('#count-req-conn').css('display', 'none');
                                         } else if (data.data.countreq > 9) {
                                             $('#count-req-conn').text("9+");
@@ -830,6 +839,8 @@
                                             $('#count-req-conn').text(data.data
                                                 .countreq);
                                         }
+
+                                        // console.log(data.data.countreq);
                                     } else {
                                         Swal.fire({
                                             title: data.message,
@@ -854,30 +865,6 @@
 
 
             //------------------ accept reject action ------------------//
-
-
-            /*
-            setInterval(() => {
-                var currentChatId = $('#send-the-msg').data('id');
-                // console.log(currentChatId);
-                if (currentChatId !== null && currentChatId !== '' && currentChatId !== 0) {
-                    let chatDiv = $('#chats');
-                    $.ajax({
-                        url: "{{ route('get-message-realtime', ['id' => ':id', 'username' => ':username']) }}"
-                            .replace(':id', currentChatId)
-                            .replace(':username', $('#send-the-msg').data('username')),
-                        type: 'GET',
-                        success: function(data) {
-                            // console.log(data);
-                            chatDiv.append(data);
-                            if (data != '' && data != null) {
-                                chatDiv.scrollTop(chatDiv.prop('scrollHeight'));
-                            }
-                        }
-                    });
-                }
-            }, 1000);
-            */
 
             // ---------------------- check For new message every 500 milisecond ---------------------- //
 
@@ -1048,7 +1035,50 @@
             var channelForFriendRequest = pusher.subscribe('friend-request');
 
             channelForFriendRequest.bind('theuser-' + {{ $authUser->id }}, function(data) {
-                alert(JSON.stringify(data));
+                // alert(JSON.stringify(data));
+                if (data.type == 'friendrequest') {
+                    let profilePic = data.userDetails.profile_pic;
+                    if (profilePic == '') {
+                        profilePic = "{{ asset('assets/images/dummy-imgs/default-profile-picture.jpg') }}";
+                    } else {
+                        profilePic = "{{ asset('user_profile_picture/thumb/') }}" + "/" + profilePic;
+                    }
+
+                    let htmlStructure = `<div class="row indivisual-user">
+                        <div class="user-image-div col-3">
+                            <img src="${profilePic}" alt="${data.userDetails.name}" class="users-dp">
+                        </div>
+                        <div class="user-details-div col-4 p-0">
+                            <p class="m-0 user-name overflow-slide">
+                                ${data.userDetails.name}
+                                (${data.userDetails.username})
+                            </p>
+                            <p class="m-0 message-details h-0">
+                                Just a moment ago
+                            </p>
+                        </div>
+                        <div class="col-5 p-0 req-action">
+                            <button data-id="${data.connectionId}" data-action="accept" data-username="${data.userDetails.username}" class="btn req-action-btn accept-btn"><img src="http://192.168.0.83:8000/assets/images/dummy-imgs/tick.png" alt="Accept"></button>
+                            <button data-id="${data.connectionId}" data-action="reject" data-username="${data.userDetails.username}" class="btn req-action-btn reject-btn"><img src="http://192.168.0.83:8000/assets/images/dummy-imgs/reject.png" alt="Accept"></button>
+                        </div>
+                    </div>
+                    <span class="separtor"></span>`;
+
+                    $('.requests-lists .col-12').append(htmlStructure);
+
+                    if (data.countReq == 0) {
+                        $('.no-requests').css('display', 'flex');
+                        $('#count-req-conn').css('display', 'none');
+                    } else if (data.countReq > 9) {
+                        $('.no-requests').css('display', 'none');
+                        $('#count-req-conn').css('display', 'inline-block');
+                        $('#count-req-conn').html('9+');
+                    } else {
+                        $('.no-requests').css('display', 'none');
+                        $('#count-req-conn').css('display', 'inline-block');
+                        $('#count-req-conn').html(data.countReq);
+                    }
+                }
             });
 
 

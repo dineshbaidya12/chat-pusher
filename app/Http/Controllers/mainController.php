@@ -236,6 +236,7 @@ class mainController extends Controller
         try {
             $id = $request->id;
             $authUser = Auth::user();
+            $reqSenderId = $authUser->id;
             if ($id == 0 || $id == '') {
                 return response()->json(['status' => false, 'message' => "Something went wrong please reload and check again."]);
             }
@@ -284,7 +285,15 @@ class mainController extends Controller
             $connection->status = 'requested';
             $connection->requested_by = $authUser->id;
             $connection->save();
-            broadcast(new SendFriendRequest($id))->toOthers();
+            $countReq = ConnectionModel::where(function ($query) use ($id) {
+                $query->where('first_user', $id)
+                    ->orWhere('second_user', $id);
+            })
+                ->where('status', 'requested')
+                ->where('requested_by', '!=', $id)
+                ->count();
+            $connectionId = $connection->id;
+            broadcast(new SendFriendRequest($id, $reqSenderId, $countReq, $connectionId))->toOthers();
             return response()->json(['status' => true, 'message' => 'Connection request send to ' . $user->name . ' (' . $user->username . ')']);
         } catch (\Exception $err) {
             return response()->json(['status' => false, 'message' => $err]);
@@ -346,11 +355,13 @@ class mainController extends Controller
                                                                 
                         </div>
                     </div>
+                    <span class="separtor"></span>
                     ';
                     $countReq = ConnectionModel::where(function ($query) use ($authId) {
                         $query->where('first_user', $authId)
                             ->orWhere('second_user', $authId);
                     })
+                        ->where('status', 'requested')
                         ->where('requested_by', '!=', $authId)
                         ->count();
                     return response()->json(['status' => true, 'accept' => true, 'message' => "Connection request accepted succesfully", 'data' => ['htmlStructure' => $htmlStructureAdded, 'countreq' => $countReq]]);
@@ -360,6 +371,7 @@ class mainController extends Controller
                         $query->where('first_user', $authId)
                             ->orWhere('second_user', $authId);
                     })
+                        ->where('status', 'requested')
                         ->where('requested_by', '!=', $authId)
                         ->count();
                     return response()->json(['status' => true, 'accept' => false, 'message' => "Connection request rejected succesfully", 'data' => ['countreq' => $countReq]]);

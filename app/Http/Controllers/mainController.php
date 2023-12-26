@@ -345,14 +345,14 @@ class mainController extends Controller
                             <img src="' . $dp . '" 
                             alt="' . $userD->name . '" class="users-dp">
                         </div>
-                        <div class="user-details-div col-9">
+                        <div class="user-details-div col-9" id="user-details-' . $connection->id . '">
                             <p class="m-0 user-name">
                                 ' . $userD->name . '
                             </p>
-                            <p class="m-0 message-details">
+                            <p class="m-0 message-details" id="conv-' . $connection->id . '">
                                 <span style="color:grey;">No Conversation Yet</span>
                             </p>
-                                                                
+                            <span class="unread-msg-count" id="user-unread-' . $connection->id . '" >0</span>                       
                         </div>
                     </div>
                     <span class="separtor"></span>

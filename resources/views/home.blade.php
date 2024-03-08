@@ -54,6 +54,10 @@
             height: 10%;
             animation: rotate 2s linear infinite;
         }
+
+        .inner-search{
+            background:  url("{{ asset('assets/images/bg/search.jpeg') }}") no-repeat center center/cover;
+        }
     </style>
 </head>
 
@@ -67,7 +71,7 @@
                 <div class="col-12 col-md-4 col-lg-3 left-bar inside-container" id="left-bar">
                     <div class="row">
                         <div class="left-bar-header p-2 w-100 position-relative">
-                            <div class="add-new-connections position-absolute">
+                            <div class="add-new-connections position-absolute" id="add-new-connections">
                                 <img src="{{ asset('assets/images/dummy-imgs/add.png') }}">
                             </div>
                             <ul class="position-absolute more-option-left" id="more-option-left">
@@ -134,7 +138,7 @@
                                     <div class="row users-list position-relative">
                                         <div class="inner-user-list added-lists" id="added-lists">
 
-                                            <div class="col-12">
+                                            <div class="col-12" id="all-connected-users">
 
                                                 @if (count($connections) > 0)
                                                     @foreach ($connections as $conn)
@@ -181,7 +185,7 @@
                                                                             $lastMessageDetails = (object) [
                                                                                 'sender' => '',
                                                                                 'status' => '',
-                                                                                'message' => '',
+                                                                                'message' => 'nothing',
                                                                             ];
                                                                         }
                                                                     @endphp
@@ -201,6 +205,9 @@
                                                                                 class="status-deleted"><span>This
                                                                                 Message
                                                                                 was Deleted</span>
+                                                                        @elseif ($lastMessageDetails->message == 'nothing')
+                                                                        <span style="color:grey;">No Conversation
+                                                                            Yet</span>
                                                                         @else
                                                                             {{ \Illuminate\Support\Str::limit(strip_tags($lastMessageDetails->message), 30) }}
                                                                         @endif
@@ -325,7 +332,7 @@
                     </div>
 
 
-                    <div class="row">
+                    <div class="row all-chats-show">
                         <div class="col-12 m-auto conversation-container">
                             <div class="conversation-header">
                                 <div class="conversation-inner-header d-flex w-100">
@@ -341,7 +348,7 @@
                                             </div>
                                             <div class="conversation-user-name">
                                                 <p class="username" id="chat-with"></p>
-                                                <p class="current-status" id="chat-with-status">Typing...</p>
+                                                <p class="current-status" id="chat-with-status">online</p>
                                             </div>
                                         </div>
                                     </div>
@@ -366,9 +373,6 @@
 
 
                                 <div class="chats" id="chats">
-
-                                    {{-- Dynamically send content  --}}
-
                                 </div>
 
 
@@ -389,11 +393,43 @@
                                     </div>
                                 </div>
                             </div>
-
-
-
                         </div>
                     </div>
+
+                    <div class="row request-main-div" style="display: none">
+                        {{-- <div class="back-to-main-chats-show">back</div> --}}
+
+                        <div class="col-12 request-navbar">
+                            <div class="back-to-main-chats-show div-sameline">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </div>
+                            <p class="div-sameline req-heading">Explore and request for new connection</p>
+                        </div>
+                        <div class="col-12 request-inner-search-div">
+                            <div class="inner-search">
+                                <input type="text" class="form-control" id="request-user-type"
+                                placeholder="Enter Name. eg: John Doe" autocomplete="off" name="request-the-db">
+                                <p class="helping-text">To get exact same person please search by his/her email address. eg: johndoe@gmail.com</p>
+                            </div>
+                        </div>
+                        <div class="col-12 suggetion-search-div">
+                            <div class="row scrollable" id="search-content-here">
+                                @foreach ($newUsers as $user)
+                                <div class='col-6 col-lg-4 col-md-6 searched-user'>
+                                    <div class='user-searched-wrpper'>
+                                        <div class='searched-user-img'>
+                                            <img src="{{$user->profile_pic == '' ? asset('assets/images/dummy-imgs/default-profile-picture.jpg') : asset('user_profile_picture/thumb/'.$user->profile_pic)}}" alt="{{ $user->name}}">
+                                        </div>
+                                    </div>
+                                    <p class='searched-names'>{{ $user->name}}({{ $user->username}})</p>
+                                    <p class='searched-desc'>{{$user->email}}</p>
+                                    <button class='request-connection-btn' data-id="{{$user->id}}" data-name="{{ $user->name}}({{ $user->username}})">Request</button>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+
 
                 </div>
             </div>
@@ -402,37 +438,6 @@
 
 
     {{-- ------------------ MOdel  -------------------- --}}
-
-    <div class="modal fade" tabindex="-1" role="dialog" id="requestModel" aria-labelledby="requestModelLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="requestModelLabel">Request to make connection</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <!-- Your form content goes here -->
-                    <div class="form-group position-relative" id="request-username">
-                        <label for="request-user-type">Username</label>
-                        <input type="text" class="form-control" id="request-user-type"
-                            placeholder="testing.web017" autocomplete="off" name="request-the-db">
-                        <ul id="suggetion-container">
-                        </ul>
-                    </div>
-                    <input type="hidden" id="request-user-id" name="request_user_id" value=""
-                        style="color:black;">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn" id="request-connection">Request</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     {{-- ------------------ MOdel  -------------------- --}}
 
 
@@ -461,6 +466,7 @@
     <script>
         $(document).ready(function() {
             let smallScreen;
+            let currentConversationId = '';
             $('.preloader').css('display', 'none');
             // console.log(channel);
 
@@ -498,6 +504,17 @@
 
 
             // ---------------- Functions Area
+
+            // fire swal 
+
+            function fireSwal(title, message, icon){
+                Swal.fire({
+                    title: title,
+                    text: message,
+                    icon: icon,
+                    confirmButtonText: 'OK'
+                });
+            }
 
             // Seacrh Bar Div
 
@@ -599,8 +616,17 @@
             //-----type 
             let textarea = $('#type-message');
 
+            let firstTyping = true;
             // Update textarea height on input change
             textarea.on('input', function() {
+                if(firstTyping){
+                    updateTypingStatus($(this).val());
+                    firstTyping = false;
+                    setTimeout(() => {
+                        firstTyping = true; 
+                    }, 500);
+                }
+                //resize
                 resizeTextarea();
             });
 
@@ -608,11 +634,25 @@
             resizeTextarea();
 
             function resizeTextarea() {
-                // Set textarea height to auto to get the actual scroll height
                 textarea.height('auto');
-
-                // Set the textarea height to its scroll height if it's less than the max height, otherwise set it to the max height
                 textarea.height(Math.min(textarea[0].scrollHeight, parseInt(textarea.css('max-height'))));
+            }
+
+
+            function updateTypingStatus(message) {
+                if (message != '') {
+                    $.ajax({
+                        url: "{{ route('typing-status-change') }}",
+                        type: 'POST',
+                        data: {
+                            id: currentConversationId,
+                            '_token': '{{ csrf_token() }}'
+                        },
+                        success: function(data) {
+                            // console.log(data);
+                        }
+                    });
+                }
             }
             //-------type
 
@@ -668,18 +708,36 @@
 
             // ------------- presss ctrl + enter to send msg -------------- //
 
-            // ---------------------- check For new message every 500 milisecond ---------------------- //
-
-
             // ------------------------ ADD NEW USER ------------------//
 
             $('.add-new-connections').on('click', function() {
                 $('#request-user-id').val('').trigger('input');
-                $('#requestModel').modal('show');
+                // $('#requestModel').modal('show');
+                if(window.innerWidth > 767){
+                    $('.all-chats-show').css('display', 'none');
+                    $('.inner-rightbar-cover').css('display', 'none');
+                    $('.request-main-div').css('display', 'block');
+                }else{
+                    $('#left-bar').css('display', 'none');
+                    $('#right-bar').css('display', 'block');
+                    $('.all-chats-show').css('display', 'none');
+                    $('.inner-rightbar-cover').css('display', 'none');
+                    $('.request-main-div').css('display', 'block');
+                }
+            });
+
+            $('.back-to-main-chats-show').on('click', function() {
+                if(window.innerWidth > 767){
+                    $('.request-main-div').css('display', 'none');
+                    $('.inner-rightbar-cover').css('display', 'flex'); 
+                }else{
+                    $('.request-main-div').css('display', 'none');
+                    $('#right-bar').css('display', 'none');
+                    $('#left-bar').css('display', 'block');
+                }
             });
 
             $('#request-user-type').on('input', function() {
-                $('#request-user-id').val('').trigger('input');
                 let username = $(this).val();
                 if (username != '') {
                     $.ajax({
@@ -687,12 +745,10 @@
                             .replace(':username', username),
                         type: 'GET',
                         success: function(data) {
-                            $('#suggetion-container').html(data.message);
+                            $('#search-content-here').html(data.message);
                         }
                     });
-                } else {
-                    $('#suggetion-container li').hide();
-                }
+                } 
             });
 
             $(document).on('click', '#suggetion-container li', function() {
@@ -712,24 +768,23 @@
             });
 
 
-            function makeRequestBtnVisible() {
-                // console.log('visible');
-                $('#request-connection').css('opacity', 1);
-                $('#request-connection').css('cursor', 'pointer');
-            }
+            // function makeRequestBtnVisible() {
+            //     // console.log('visible');
+            //     $('#request-connection').css('opacity', 1);
+            //     $('#request-connection').css('cursor', 'pointer');
+            // }
 
-            function makeRequestBtnInvisible() {
-                // console.log('invisible');
-                $('#request-connection').css('opacity', .1);
-                $('#request-connection').css('cursor', 'no-drop');
-            }
+            // function makeRequestBtnInvisible() {
+            //     // console.log('invisible');
+            //     $('#request-connection').css('opacity', .1);
+            //     $('#request-connection').css('cursor', 'no-drop');
+            // }
 
-            $('#request-connection').on('click', function() {
-                let id = $('#request-user-id').val();
-                // console.log(id);
+            $(document).on('click','.request-connection-btn', function() {
+                let id = $(this).data('id');
+                let btn=$(this);
                 if (id != '' && id != 0) {
-                    $('#request-connection').css('pointer-events', 'none');
-                    $('#request-connection').text('Please Wait...');
+                    btn.html('...');
                     $.ajax({
                         url: "{{ route('send-request') }}",
                         type: 'POST',
@@ -739,8 +794,6 @@
                         },
                         success: function(data) {
                             if (data.status) {
-                                $('#request-user-type').val('');
-                                $('#request-user-id').val('').trigger('input');
                                 Swal.fire({
                                     title: data.message,
                                     icon: 'success',
@@ -753,12 +806,10 @@
                                     confirmButtonText: 'OK'
                                 });
                             }
-                            $('#request-connection').css('pointer-events', 'auto');
-                            $('#request-connection').text('Request');
+                            btn.html('Request');
                         },
                         error: function(data) {
-                            $('#request-connection').css('pointer-events', 'auto');
-                            $('#request-connection').text('Request');
+                            btn.html('Request');
                         }
                     });
                 }
@@ -877,15 +928,11 @@
             });
 
             var channelForConversation = pusher.subscribe('privet');
-
-
+            var channelForTyping = pusher.subscribe('typing-status');
 
             // -----------------  pusher  -------------------// 
 
             //----------- send message ---------//
-
-
-
             $('#send-the-msg').on('click', function() {
                 $('.no-conv').css('display', 'none');
                 let chatsDiv = $('#chats');
@@ -894,27 +941,29 @@
                 let id = $(this).data('id');
                 let convId = $(this).data('conv-id');
                 // console.log(convId);
-                var newDiv = $('<div>', {
-                    'class': 'parent-conv sender'
-                });
-                let messageWithoutHTML = $('<div>').html(message).text();
-                let formattedTime = new Date().toLocaleString('en-US', {
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    hour12: true
-                });
-                $('#conv-' + convId).html(
-                    `<img class="status-unread" src="{{ asset('assets/images/dummy-imgs/tick.png') }}">` +
-                    messageWithoutHTML.substring(0, 25));
-                let newDivContent =
-                    `<div class="conversations-sender conversations"><p>${messageWithoutHTML}</p></div>
-                <div class="message-time">${formattedTime}</div>`;
-                newDiv.html(newDivContent);
-                chatsDiv.append(newDiv);
-                scrollToBottom();
-                $('#type-message').val('');
-
                 if (id != '' && message !== '') {
+                    var newDiv = $('<div>', {
+                        'class': 'parent-conv sender'
+                    });
+                    let messageWithoutHTML = $('<div>').html(message).text();
+                    let formattedTime = new Date().toLocaleString('en-US', {
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true
+                    });
+                    $('#conv-' + convId).html(
+                        `<img class="status-waitting" src="{{ asset('assets/images/dummy-imgs/clock.png') }}">` +
+                        messageWithoutHTML.substring(0, 25));
+                    let newDivContent =
+                        `<div class="conversations-sender conversations">
+                            <div class="clock"><i class="fa-regular fa-clock"></i></div>
+                            <p>${messageWithoutHTML}</p></div>
+                    <div class="message-time">${formattedTime}</div>`;
+                    newDiv.html(newDivContent);
+                    chatsDiv.append(newDiv);
+                    scrollToBottom();
+                    $('#type-message').val('');
+
                     $.ajax({
                         url: "{{ route('send-messasge') }}",
                         type: 'POST',
@@ -934,6 +983,10 @@
                                     icon: 'error',
                                     confirmButtonText: 'OK'
                                 });
+                            }else{
+                                $('.clock').css('display', 'none');
+                                $('#conv-' + convId +' img').attr('src', "{{ asset('assets/images/dummy-imgs/tick.png') }}");
+                                $('#conv-' + convId +' img').attr('class', "status-unread");
                             }
                         }
                     });
@@ -944,13 +997,40 @@
             });
             //----------- send message ---------//
 
+            // -------------------------------- Long Press Options ------------------------------------------------//
+            let timer;
+            const holdDuration = 500;
+
+            // $('.parent-conv').on('mousedown', function() {
+            //     timer = setTimeout(function() {
+            //         alert('Long hold action executed');
+            //     }, holdDuration);
+            // }).on('mouseup', function() {
+            //     clearTimeout(timer);
+            // });
+
+            $(".parent-conv").mouseup(function(){
+                clearTimeout(timer);
+                return false;
+                }).mousedown(function(){
+                timer = window.setTimeout(function() {
+                    alert('long pressed');
+                },500);
+                return false; 
+            });
+            // -------------------------------- Long Press Options ------------------------------------------------//
+
             // --------------------------------  Dynamically get the chats ----------------------------------------//
             let previousbind = '';
             let isFirst = true;
+            let isFirstTyping = true;
+            let typingBind = '';
             let eventName = '';
             let realChatHtml = '';
             $(document).on('click', '#added-lists .indivisual-user', function(e) {
                 // console.log('ab ayega maaza');
+                $('#type-message').val('');
+                $('#type-message').focus();
                 let countSpan = $(this).find('.unread-msg-count');
                 let username = $(this).data('username');
                 let id = $(this).data('id');
@@ -968,10 +1048,12 @@
                         chatsSecD.scrollTop(chatsSecD.prop('scrollHeight'));
                         chatsSecD.css('scroll-behavior', 'smooth');
                         $('.inner-rightbar-cover').css('display', 'none');
+                        $('.all-chats-show').css('display', 'block');
                         var connectionId = data.connectionId;
+                        currentConversationId = connectionId;
+                        changeTypingChannel(connectionId);
                         changeChannel(connectionId);
                         $('#send-the-msg').data('conv-id', connectionId);
-                        $('#type-message').focus();
                         $('.small-left-bar').css('display', 'none');
                         $('.small-right-bar').css('display', 'block');
                         countSpan.css('display', 'none');
@@ -990,7 +1072,6 @@
                 }
 
                 channelForConversation.bind('chats-' + id, function(data) {
-
                     realChatHtml = `
                     <div class="parent-conv reciever">
                         <div class="conversations-reciever conversations">
@@ -1006,6 +1087,27 @@
 
                 // alert(channelForConversation);
             }
+            let timeoutt= '';
+            function changeTypingChannel(id){
+                if (isFirstTyping) {
+                    isFirstTyping = false;
+                    typingBind = 'typingstatus-' + id;
+                } else {
+                    channelForTyping.unbind(typingBind);
+                    typingBind = 'typingstatus-' + id;
+                }
+
+                channelForTyping.bind('typingstatus-' + id, function(data) {
+                    let authID = {{$authUser->id }};
+                    if(authID != data.whoIsTyping){
+                        $('#chat-with-status').html('typing..');
+                        clearTimeout(timeoutt);
+                        timeoutt = setTimeout(() => {
+                            $('#chat-with-status').html('online');
+                        }, 1000);
+                    }
+                });
+            }
 
             // --------------------------------  Dynamically get the chats ----------------------------------------// 
 
@@ -1016,6 +1118,7 @@
             channelForLeftBarConv.bind('conv-' + {{ $authUser->id }}, function(data) {
                 let message = $('<div>').html(data.message).text().substring(0, 25);
                 $('#conv-' + data.convId).html(message);
+                $('.no-conv').css('display', 'none');
                 if ($('#send-the-msg').data('conv-id') != data.convId) {
                     $('#user-unread-' + data.convId).text(data.unreadMsg);
                     $('#user-unread-' + data.convId).css('display', 'block');
@@ -1027,7 +1130,6 @@
                 }
             });
 
-
             // --------------------- Realtime Leftbar Notification ------------------------// 
 
             // --------------------- Friend Request Notification ------------------------//
@@ -1035,7 +1137,6 @@
             var channelForFriendRequest = pusher.subscribe('friend-request');
 
             channelForFriendRequest.bind('theuser-' + {{ $authUser->id }}, function(data) {
-                // alert(JSON.stringify(data));
                 if (data.type == 'friendrequest') {
                     let profilePic = data.userDetails.profile_pic;
                     if (profilePic == '') {
@@ -1084,6 +1185,40 @@
 
             // --------------------- Friend Request Notification ------------------------// 
 
+            // --------------------- Friend Request accept Notification ------------------------//
+            var channelForAcceptFriendRequest = pusher.subscribe('accept-request');
+
+            channelForAcceptFriendRequest.bind('userid-{{ $authUser->id }}', function(data) {
+                fireSwal('Connection Request Accept', data.acceptedUserDetails.name + ' has accepted your connection request.', 'success');
+                $('#no-connection-p').css('display', 'none');
+                let profilePic = data.acceptedUserDetails.profile_pic;
+                if (profilePic == '') {
+                    profilePic = "{{ asset('assets/images/dummy-imgs/default-profile-picture.jpg') }}";
+                } else {
+                    profilePic = "{{ asset('user_profile_picture/thumb/') }}" + "/" + profilePic;
+                }
+
+                let prependContent = `<div class="row indivisual-user" data-id="${data.acceptedUserId}" data-username="rishi" data-name="${data.acceptedUserDetails.name}">
+                        <div class="user-image-div col-3">
+                            <img src="${profilePic}" alt="${data.acceptedUserDetails.name}" class="users-dp">
+                        </div>
+                        <div class="user-details-div col-9" id="user-details-${data.conversationId}">
+                            <p class="m-0 user-name">
+                                ${data.acceptedUserDetails.name}
+                            </p>
+                            <p class="m-0 message-details" id="conv-${data.conversationId}">
+                                <span style="color:grey;">No Conversation Yet</span>
+                            </p>
+                            <span class="unread-msg-count" id="user-unread-${data.conversationId}">0</span>                       
+                        </div>
+                    </div><span class="separtor"></span>`;
+                
+                $('#all-connected-users').prepend(prependContent);
+
+            });
+
+            // --------------------- Friend Request accept Notification ------------------------//
+
             // This is end of Document ready
         });
 
@@ -1104,6 +1239,7 @@
                 document.getElementById('right-bar').classList.add('small-right-bar');
                 document.getElementById('left-bar').classList.add('small-left-bar');
                 $('.small-right-bar').css('display', 'none');
+                $('.request-main-div').css('display', 'none');
             } else {
                 // console.log('not less than 767px');
                 smallScreen = false;
@@ -1193,6 +1329,12 @@
                 event.preventDefault();
                 $('#search-user').click();
             }
+        });
+
+        window.addEventListener('beforeunload', function(event) {
+            event.preventDefault();
+            event.returnValue = '';
+            alert('Are you sure you want to leave Realchat?');
         });
     </script>
     {{-- -------------------- shortcuts and click event ---------------- --}}

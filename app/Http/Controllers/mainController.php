@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\AccesptFriendRequest;
 use App\Events\LeftBarBrodacast;
 use App\Events\PusherBroadcast;
 use App\Events\SendFriendRequest;
+use App\Events\TypingStatus;
 use App\Models\Connection as ConnectionModel;
 use App\Models\Message;
 use App\Models\User;
@@ -69,8 +71,9 @@ class mainController extends Controller
             ->select('id', 'first_user', 'second_user', 'last_message', 'created_at')
             ->get();
 
+        $newUsers = User::where('type', 'user')->where('status', 'active')->whereNot('id', $authUser->id)->orderBy('created_at', 'DESC')->limit(50)->select('name', 'username', 'email', 'profile_pic', 'id')->get();
         // dd($requestsLists->toArray());
-        return view('home', compact('connections', 'requestsLists', 'authUser'));
+        return view('home', compact('connections', 'requestsLists', 'authUser', 'newUsers'));
     }
 
     public function getMessage($id, $username)
@@ -206,10 +209,10 @@ class mainController extends Controller
     {
         try {
             if ($username == '') {
-                return response()->json(['status' => true, 'message' => '']);
+                return response()->json(['status' => true, 'message' => '<p class="no-user-found">No User Found</p>']);
             }
             $authUser = Auth::user();
-            $users = User::where('username', 'like', '%' . $username . '%')->orWhere('name', 'like', '%' . $username . '%')->where('status', 'active')->where('type', 'user')->select('id', 'name', 'username', 'profile_pic')->limit(50)->get();
+            $users = User::where('username', 'like', '%' . $username . '%')->orWhere('name', 'like', '%' . $username . '%')->where('status', 'active')->where('type', 'user')->select('id', 'name', 'username', 'profile_pic', 'email')->limit(50)->get();
             $response = '';
             foreach ($users as $user) {
                 if ($user->id == $authUser->id) {
@@ -222,8 +225,20 @@ class mainController extends Controller
                     $profilePic = asset('assets/images/dummy-imgs/default-profile-picture.jpg');
                 }
 
-                $response .= "<li data-id=\"$user->id\" data-name=\"$user->name ($user->username)\"><img src=\"$profilePic\" alt=\"$user->username\" class=\"suggestion-users\">$user->name ($user->username)</li>";
+                $response .= "
+                    <div class='col-6 col-lg-4 col-md-6 searched-user'>
+                    <div class='user-searched-wrpper'>
+                        <div class='searched-user-img'>
+                            <img src=\"$profilePic\" alt=\"$user->username\">
+                        </div>
+                    </div>
+                    <p class='searched-names'>$user->name($user->username)</p>
+                    <p class='searched-desc'>$user->email</p>
+                    <button class='request-connection-btn' data-id=\"$user->id\" data-name=\"$user->name ($user->username)\">Request</button>
+                </div>
+                ";
             }
+            $response == '' ? $response = '<p class="no-user-found">No User Found</p>' :  $response;
 
             return response()->json(['status' => true, 'message' => $response]);
         } catch (\Exception $err) {
@@ -364,6 +379,7 @@ class mainController extends Controller
                         ->where('status', 'requested')
                         ->where('requested_by', '!=', $authId)
                         ->count();
+                    broadcast(new AccesptFriendRequest($authId, $otherUser, $connection->id))->toOthers();
                     return response()->json(['status' => true, 'accept' => true, 'message' => "Connection request accepted succesfully", 'data' => ['htmlStructure' => $htmlStructureAdded, 'countreq' => $countReq]]);
                 } else {
                     $connection->delete();
@@ -397,5 +413,19 @@ class mainController extends Controller
             return 'diff status';
         }
         return 'no msg';
+    }
+
+    public function typingStatusChange(Request $request)
+    {
+        try {
+            $authUser = Auth::user();
+            if ($request->id == '') {
+                return response()->json(['status' => false, 'message' => 'Id is required']);
+            }
+            broadcast(new TypingStatus($request->id, $authUser->id))->toOthers();
+            return response()->json(['status' => true, 'message' => 'status updated']);
+        } catch (\Exception $err) {
+            return response()->json(['status' => false, 'message' => 'something went wrong']);
+        }
     }
 }

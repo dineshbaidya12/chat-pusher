@@ -426,6 +426,7 @@ hr {
     height: 86%;
 }
 
+
 /* WebKit scrollbar styles */
 .conversation-chats-container .chats::-webkit-scrollbar {
     width: 8px;
@@ -438,6 +439,26 @@ hr {
 .conversation-chats-container .chats::-webkit-scrollbar-track {
     background-color: #4f5055;
 }
+
+.scrollable {
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #394053 #4f5055;
+}
+
+.scrollable::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+    background-color: #394053;
+}
+
+.scrollable::-webkit-scrollbar-track {
+    background-color: #4f5055;
+}
+
 
 .conversation-chats-container .typing-area {
     height: 97px;
@@ -452,6 +473,7 @@ hr {
     padding: 5px 16px;
     max-width: 60%;
     width: fit-content;
+    position: relative;
 }
 
 .conversations-reciever {
@@ -516,6 +538,19 @@ hr {
     padding-top: 3px;
     font-family: var(--primary-heading);
     padding-left: 9px;
+}
+
+.clock {
+    position: absolute;
+    font-size: 8px;
+    bottom: 0px;
+    right: 2px;
+}
+
+.status-waitting {
+    width: 10px;
+    margin-top: -2px;
+    margin-right: 3px;
 }
 
 .sender .message-time {
@@ -869,12 +904,111 @@ emoji-picker {
     padding-top: 2px;
 }
 
+.request-main-div {
+    background: #181616;
+    height: 100vh;
+}
 
+.request-navbar {
+    background: #373737;
+}
 
+.back-to-main-chats-show {
+    color: white;
+    font-size: 18px;
+    padding-left: 10px;
+    cursor: pointer;
+}
 
+.request-navbar {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
 
+.req-heading {
+    color: white;
+    margin: 0;
+    padding-left: 14px;
+    padding-top: 2px;
+}
 
+.inner-search {
+    padding: 50px 86px;
+}
 
+.helping-text {
+    margin: 0;
+    font-size: 12px;
+    margin-top: 7px;
+    margin-left: 3px;
+    color: #fff;
+    text-shadow: 1px 1px 1px black;
+}
+
+.suggetion-search-div .row {
+    padding: 20px;
+    max-height: 72vh;
+}
+
+.suggetion-search-div .row .user-searched-wrpper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.suggetion-search-div .row .user-searched-wrpper .searched-user-img {
+    height: 100px;
+}
+
+.suggetion-search-div .row .user-searched-wrpper .searched-user-img img {
+    height: 100%;
+    object-fit: cover;
+}
+
+.searched-names,
+.searched-desc {
+    margin: 0px;
+    font-size: 14px;
+    text-align: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    color: white;
+    line-height: 14px;
+}
+
+.searched-names {
+    margin-top: 3px;
+}
+
+.suggetion-search-div .row .col-6 {
+    margin-bottom: 20px;
+}
+
+.suggetion-search-div .row .request-connection-btn {
+    border: 0px;
+    background: #176dc8;
+    color: white;
+    font-size: 14px;
+    padding: 3px 21px;
+    margin-top: 1px;
+    display: block;
+    margin: auto;
+    cursor: pointer;
+    transition: .1s ease-in;
+    margin-top: 2px;
+}
+
+.suggetion-search-div .row button:hover {
+    background: #1b5491;
+}
+
+.no-user-found {
+    color: white;
+    text-align: center;
+    display: block;
+    width: 100%;
+    font-size: 20px;
+}
 
 
 
@@ -955,6 +1089,10 @@ emoji-picker {
 
     .users-list {
         transform: translateX(1.2%);
+    }
+
+    .inner-search {
+        padding: 50px 30px;
     }
 }
 

@@ -29,34 +29,44 @@
             $lastFormattedDate = $formattedDate;
         @endphp
         @if ($msg->sender == auth()->user()->id)
-            <div class="parent-conv sender">
+            <div class="parent-conv sender" data-msgid="{{$msg->id}}">
                 <div class="conversations-sender conversations">
-                    <p>
-                        @if ($msg->status !== 'deleted')
-                            {!! $msg->message ?? '' !!}
-                        @else
-                            <img style="padding-top:3px; opacity: .4;"
-                                src="{{ asset('assets/images/dummy-imgs/block.png') }}" class="status-deleted"><span
-                                class="deleted-msg">This Message was
-                                Deleted</span>
-                        @endif
-                    </p>
+                    @if ($msg->forward == 'yes')
+                        <p class="forward-msg"><i class="fas fa-share"></i>Forwarded</p>
+                    @endif
+                    <span class="message_content">
+                        <p>
+                            @if ($msg->status !== 'deleted')
+                                {!! $msg->message ?? '' !!}
+                            @else
+                                <img style="padding-top:3px; opacity: .4;"
+                                    src="{{ asset('assets/images/dummy-imgs/block.png') }}" class="status-deleted"><span
+                                    class="deleted-msg">This Message was
+                                    Deleted</span>
+                            @endif
+                        </p>
+                    </span>
                 </div>
                 <div class="message-time">{{ \Carbon\Carbon::parse($msg->time)->format('h:iA') }}</div>
             </div>
         @else
-            <div class="parent-conv reciever">
+            <div class="parent-conv reciever" data-msgid="{{$msg->id}}">
                 <div class="conversations-reciever conversations">
-                    <p>
-                        @if ($msg->status !== 'deleted')
-                            {!! $msg->message ?? '' !!}
-                        @else
-                            <img style="padding-top:3px; opacity: .4;"
-                                src="{{ asset('assets/images/dummy-imgs/block.png') }}" class="status-deleted"><span
-                                class="deleted-msg">This Message was
-                                Deleted</span>
-                        @endif
-                    </p>
+                    @if ($msg->forward == 'yes')
+                        <p class="forward-msg"><i class="fas fa-share"></i>Forwarded</p>
+                    @endif
+                    <span class="message_content">
+                        <p>
+                            @if ($msg->status !== 'deleted')
+                                {!! $msg->message ?? '' !!}
+                            @else
+                                <img style="padding-top:3px; opacity: .4;"
+                                    src="{{ asset('assets/images/dummy-imgs/block.png') }}" class="status-deleted"><span
+                                    class="deleted-msg">This Message was
+                                    Deleted</span>
+                            @endif
+                        </p>
+                    </span>
                 </div>
                 <div class="message-time">{{ \Carbon\Carbon::parse($msg->time)->format('h:iA') }}</div>
             </div>

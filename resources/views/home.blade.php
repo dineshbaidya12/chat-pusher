@@ -62,6 +62,9 @@
 </head>
 
 <body class="position-relative">
+    <div id="bottomNotification">
+        <p></p>
+    </div>
     <div class="preloader">
         <img src="{{ asset('assets/images/bg/buffer.png') }}">
     </div>
@@ -166,10 +169,10 @@
                                                             <div class="user-image-div col-3">
                                                                 @if ($profilePic != null || $profilePic != '' || !file_exists('user_profile_picture/thumb/' . $profilePic))
                                                                     <img src="{{ asset('user_profile_picture/thumb/' . $profilePic) }}"
-                                                                        alt="Lorem Ipsum" class="users-dp">
+                                                                        alt="{{$name ?? ''}}" class="users-dp">
                                                                 @else
                                                                     <img src="{{ asset('assets/images/dummy-imgs/default-profile-picture.jpg') }}"
-                                                                        alt="Lorem Ipsum" class="users-dp">
+                                                                        alt="{{$name ?? ''}}" class="users-dp">
                                                                 @endif
                                                             </div>
                                                             <div class="user-details-div col-9"
@@ -322,7 +325,6 @@
                     </div>
                 </div>
                 <div class="col-12 col-md-8 col-lg-9 right-bar" id="right-bar">
-
                     <div class="inner-rightbar-cover">
                         <h1 class="str-conv-h1">Start Conversation<span
                                 style="color:#202124; font-weight:bold; font-family:var(--primary-heading);text-shadow: 1px 1px 1px #f97d7d;">
@@ -335,6 +337,24 @@
                     <div class="row all-chats-show">
                         <div class="col-12 m-auto conversation-container">
                             <div class="conversation-header">
+
+                                <div class="more-msg-options-wrapper">
+                                    <div class="inner-options copy-div" data-messageid="0" data-bs-toggle="tooltip" data-bs-placement="top" title="copy text">
+                                        <i class="fa-solid fa-copy"></i>
+                                    </div>
+                                    <div class="inner-options delete-div" data-messageid="0" data-bs-toggle="tooltip" data-bs-placement="top" title="delete">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </div>
+                                    <div class="inner-options forward-div" data-messageid="0" data-bs-toggle="tooltip" data-bs-placement="top" title="forward">
+                                        <i class="fas fa-share"></i>
+                                    </div>
+                                    <div class="inner-options close-more-opt-div" data-messageid="0" data-bs-toggle="tooltip" data-bs-placement="top" title="close">
+                                        <i class="fas fa-close"></i>
+                                    </div>
+                                </div>
+
+
+
                                 <div class="conversation-inner-header d-flex w-100">
 
                                     <div class="left-conv-header d-flex">
@@ -409,7 +429,7 @@
                             <div class="inner-search">
                                 <input type="text" class="form-control" id="request-user-type"
                                 placeholder="Enter Name. eg: John Doe" autocomplete="off" name="request-the-db">
-                                <p class="helping-text">To get exact same person please search by his/her email address. eg: johndoe@gmail.com</p>
+                                <p class="helping-text">To get exact same person please search by his/her username. eg: johndoe123</p>
                             </div>
                         </div>
                         <div class="col-12 suggetion-search-div">
@@ -437,7 +457,77 @@
     </div>
 
 
-    {{-- ------------------ MOdel  -------------------- --}}
+    {{-- ------------------ Model  -------------------- --}}
+    <div class="modal fade" id="forewardmessage" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalTitle">Select connection to share</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body forward-user-list-body scrollable">
+                <div class="forward-users-wrapper">
+                    @if (count($connections) > 0)
+                        @foreach ($connections as $conn)
+                            @if ($conn->first_user !== auth()->user()->id)
+                                @php
+                                    $userId = $conn->first_user;
+                                    $name = $conn->firstUserDetails->name;
+                                    $profilePic = $conn->firstUserDetails->profile_pic;
+                                    $connectedUserId = $conn->firstUserDetails->id;
+                                    $connectedUsername = $conn->firstUserDetails->username;
+                                    $email = $conn->firstUserDetails->email;
+                                    @endphp
+                            @else
+                            @php
+                                    $userId = $conn->second_user;
+                                    $name = $conn->sedondUserDetails->name;
+                                    $profilePic = $conn->sedondUserDetails->profile_pic;
+                                    $connectedUserId = $conn->sedondUserDetails->id;
+                                    $connectedUsername = $conn->sedondUserDetails->username;
+                                    $email = $conn->sedondUserDetails->email;
+                                @endphp
+                            @endif
+
+                            <div class="row connection-users">
+                                <div class="col-1">
+                                    <input type="checkbox" name="forward-msg-checkbox" data-id="{{$userId}}">
+                                </div>
+                                <div class="col-3">
+                                    <div class="image-dp">
+                                        @if ($profilePic != null || $profilePic != '' || !file_exists('user_profile_picture/thumb/' . $profilePic))
+                                            <img src="{{ asset('user_profile_picture/thumb/' . $profilePic) }}"
+                                                alt="{{ $name }}" class="forward-users-dp">
+                                        @else
+                                            <img src="{{ asset('assets/images/dummy-imgs/default-profile-picture.jpg') }}"
+                                                alt="{{ $name }}" class="forward-users-dp">
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="col-8">
+                                    <div class="user-details-div">
+                                       <p>{{$name}} ({{$connectedUsername}})</p>
+                                       <p class="extra-details">{{$email}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                        @endforeach
+                    @endif
+                </div>
+            
+            </div>
+            <div class="modal-footer">
+            {{-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> --}}
+            <button type="button" class="btn forward-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="send">
+                <i class="fa fa-paper-plane"></i>
+            </button>
+            </div>
+        </div>
+        </div>
+    </div>
     {{-- ------------------ MOdel  -------------------- --}}
 
 
@@ -504,6 +594,23 @@
 
 
             // ---------------- Functions Area
+
+            //bottom notification
+
+            function bottomNotification(message = ''){
+                $('#bottomNotification p').text(message);
+                $('#bottomNotification').css('display', 'block');
+                setTimeout(() => {
+                    $('#bottomNotification').fadeOut();
+                }, 2000);
+            }
+
+            //reset conv
+
+            function resetConversationId(){
+                $('#send-the-msg').data('conv-id', '');
+                currentConversationId = '';
+            }
 
             // fire swal 
 
@@ -598,20 +705,6 @@
             }
 
             //-----------more option 
-
-
-            //---show hide time 
-
-            $(document).on('click', '.parent-conv', function() {
-                var messageTime = $(this).find('.message-time');
-                if (messageTime.css('display') == 'none') {
-                    messageTime.css('display', 'block');
-                } else {
-                    messageTime.css('display', 'none');
-                }
-            });
-
-            //--------show hide time
 
             //-----type 
             let textarea = $('#type-message');
@@ -711,6 +804,7 @@
             // ------------------------ ADD NEW USER ------------------//
 
             $('.add-new-connections').on('click', function() {
+                resetConversationId();
                 $('#request-user-id').val('').trigger('input');
                 // $('#requestModel').modal('show');
                 if(window.innerWidth > 767){
@@ -750,35 +844,6 @@
                     });
                 } 
             });
-
-            $(document).on('click', '#suggetion-container li', function() {
-                $('#request-user-type').val($(this).data('name'));
-                $('#suggetion-container li').hide();
-                $('#request-user-id').val($(this).data('id')).trigger(
-                    'input');
-            });
-
-
-            $('#request-user-id').on('input', function() {
-                if ($(this).val() == '') {
-                    makeRequestBtnInvisible();
-                } else {
-                    makeRequestBtnVisible();
-                }
-            });
-
-
-            // function makeRequestBtnVisible() {
-            //     // console.log('visible');
-            //     $('#request-connection').css('opacity', 1);
-            //     $('#request-connection').css('cursor', 'pointer');
-            // }
-
-            // function makeRequestBtnInvisible() {
-            //     // console.log('invisible');
-            //     $('#request-connection').css('opacity', .1);
-            //     $('#request-connection').css('cursor', 'no-drop');
-            // }
 
             $(document).on('click','.request-connection-btn', function() {
                 let id = $(this).data('id');
@@ -837,7 +902,6 @@
 
 
             //------------------ accept reject action ------------------//
-
 
             $(document).on('click', '.req-action-btn', function() {
                 let id = $(this).data('id');
@@ -943,7 +1007,8 @@
                 // console.log(convId);
                 if (id != '' && message !== '') {
                     var newDiv = $('<div>', {
-                        'class': 'parent-conv sender'
+                        'class': 'parent-conv sender',
+                        'data-msgid' : 0
                     });
                     let messageWithoutHTML = $('<div>').html(message).text();
                     let formattedTime = new Date().toLocaleString('en-US', {
@@ -957,7 +1022,7 @@
                     let newDivContent =
                         `<div class="conversations-sender conversations">
                             <div class="clock"><i class="fa-regular fa-clock"></i></div>
-                            <p>${messageWithoutHTML}</p></div>
+                            <span class="message_content"><p>${messageWithoutHTML}</p></span></div>
                     <div class="message-time">${formattedTime}</div>`;
                     newDiv.html(newDivContent);
                     chatsDiv.append(newDiv);
@@ -987,6 +1052,7 @@
                                 $('.clock').css('display', 'none');
                                 $('#conv-' + convId +' img').attr('src', "{{ asset('assets/images/dummy-imgs/tick.png') }}");
                                 $('#conv-' + convId +' img').attr('class', "status-unread");
+                                newDiv.data('msgid', data.msgid);
                             }
                         }
                     });
@@ -999,25 +1065,123 @@
 
             // -------------------------------- Long Press Options ------------------------------------------------//
             let timer;
-            const holdDuration = 500;
+            let theGlobalMsgId = 0;
 
-            // $('.parent-conv').on('mousedown', function() {
-            //     timer = setTimeout(function() {
-            //         alert('Long hold action executed');
-            //     }, holdDuration);
-            // }).on('mouseup', function() {
-            //     clearTimeout(timer);
+            // parent conv click listener
+
+            $(document).on('click', '.parent-conv', function(e) {
+                if($(this).data('msgid') != theGlobalMsgId){
+                    closeMoreMessageOpt();
+                }
+                var messageTime = $(this).find('.message-time');
+                if (messageTime.css('display') == 'none') {
+                    messageTime.css('display', 'block');
+                } else {
+                    messageTime.css('display', 'none');
+                }
+            });
+
+            // parent conv longpressed listener
+
+            $(document).on('mousedown touchstart', '.parent-conv', function(e) {
+                let parentConv = $(this);
+                timer = setTimeout(function() {
+                    openMoreMessageOpt(parentConv);
+                }, 500);
+            }).on('mouseup touchend', function() {
+                clearTimeout(timer);
+            });
+            // $('.inner-options').click(function(){
+            //     console.log($(this).data('messageid'));
             // });
 
-            $(".parent-conv").mouseup(function(){
-                clearTimeout(timer);
-                return false;
-                }).mousedown(function(){
-                timer = window.setTimeout(function() {
-                    alert('long pressed');
-                },500);
-                return false; 
+            // ----------------------- More msg options -------------------//
+
+            $('.copy-div').on('click', function(){
+                let theMessageId = $(this).data('messageid');
+                console.log(theMessageId);
+                if (theMessageId != '0') {
+                    let copyText = $('#chats div[data-msgid="' + theMessageId + '"] .conversations .message_content').text().trim();
+                    let tempTextArea = $('<textarea>');
+                    tempTextArea.val(copyText).css({position: 'fixed', left: '-9999px'}).appendTo($('body'));
+                    tempTextArea[0].select();
+                    tempTextArea[0].setSelectionRange(0, copyText.length);
+                    document.execCommand('copy');
+                    tempTextArea.remove();
+                    bottomNotification('text copied');
+                    closeMoreMessageOpt();
+                }
             });
+
+            $('.forward-div').on('click', function(){
+                $('input[name="forward-msg-checkbox"]').prop('checked', false);
+                $('#forewardmessage').modal('show');
+            });
+
+            $('.forward-btn').on('click', function(){
+                var checkedIds = [];
+                $('input[name="forward-msg-checkbox"]:checked').each(function() {
+                    checkedIds.push($(this).data('id'));
+                });
+                if(checkedIds != ''){
+                    $('.forward-btn').html('...');
+                    $.ajax({
+                        url: "{{route('forward-message')}}",
+                        type: 'POST',
+                        data: {
+                            checkedIds: checkedIds,
+                            messageId: theGlobalMsgId,
+                            '_token': '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            $('.forward-btn').html('<i class="fa fa-paper-plane"></i>');
+                            bottomNotification('message forwared');
+                            $('#forewardmessage').modal('hide');
+                            closeMoreMessageOpt();
+                        },
+                        error: function(error) {
+                            console.log(error);
+                            $('.forward-btn').html('<i class="fa fa-paper-plane"></i>');
+                        }
+                    });
+                }
+            });
+
+            $('.close-more-opt-div').on('click', function(){
+                closeMoreMessageOpt();
+            });
+
+            function closeMoreMessageOpt(){
+                let element = $('#chats div[data-msgid="' + theGlobalMsgId + '"]').css('background', 'transparent');
+                theGlobalMsgId = 0;
+                $('.inner-options').data('messageid', '0');
+                $('.more-msg-options-wrapper').css('display', 'none');
+            }
+
+            function openMoreMessageOpt(element){
+                closeMoreMessageOpt();
+                element.css('background', '#387bc478');
+                let msgId = element.data('msgid');
+                theGlobalMsgId = msgId;
+                $('.inner-options').data('messageid', msgId);
+                $('.more-msg-options-wrapper').css('display', 'flex');
+            }
+
+            //stop close modal if click outside
+            $('#forewardmessage').on('click', function (e) {
+                if ($(e.target).hasClass('modal')) {
+                    e.stopPropagation();
+                }
+            });
+
+            //checkbox for foreward message 
+            $('.connection-users').on('click', function() {
+                var checkbox = $(this).find('input[name="forward-msg-checkbox"]');
+                checkbox.prop('checked', !checkbox.prop('checked'));
+            });
+
+            // ----------------------- More msg options -------------------//
+
             // -------------------------------- Long Press Options ------------------------------------------------//
 
             // --------------------------------  Dynamically get the chats ----------------------------------------//
@@ -1028,7 +1192,7 @@
             let eventName = '';
             let realChatHtml = '';
             $(document).on('click', '#added-lists .indivisual-user', function(e) {
-                // console.log('ab ayega maaza');
+                closeMoreMessageOpt();
                 $('#type-message').val('');
                 $('#type-message').focus();
                 let countSpan = $(this).find('.unread-msg-count');
@@ -1072,10 +1236,17 @@
                 }
 
                 channelForConversation.bind('chats-' + id, function(data) {
-                    realChatHtml = `
-                    <div class="parent-conv reciever">
-                        <div class="conversations-reciever conversations">
-                            ` + data.message + `
+                    if(data.messagedata.sender == {{$authUser->id}}){
+                        realChatHtml = `<div class="parent-conv sender" data-msgid="${data.messagedata.id}"><div class="conversations-sender conversations">`;
+                    }else{
+                        realChatHtml = `<div class="parent-conv reciever"><div class="conversations-reciever conversations">`;
+                    }
+
+                    if(data.forward == 'true'){
+                        realChatHtml += `<p class="forward-msg"><i class="fas fa-share"></i>Forwarded</p>`;  
+                    }
+
+                    realChatHtml += `<span class="message_content"><p>`+data.message + `</p></span>
                         </div>
                         <div class="message-time">` + data.formattedTime + `</div>
                     </div>

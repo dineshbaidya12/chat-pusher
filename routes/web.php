@@ -37,4 +37,5 @@ Route::group(['middleware' => 'checkUserLoggedIn'], function () {
     Route::post('/accept-reject-request', [MainController::class, 'acceptRejectRequest'])->name('accept-reject-request');
     Route::get('/seen-msg/{id}', [MainController::class, 'seenMsg'])->name('seen-msg');
     Route::post('typing-status-change', [MainController::class, 'typingStatusChange'])->name('typing-status-change');
+    Route::post('forward-message', [MainController::class, 'forwardMessage'])->name('forward-message');
 });

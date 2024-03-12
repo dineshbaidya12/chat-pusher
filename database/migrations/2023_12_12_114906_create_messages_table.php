@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreign('sender')->references('id')->on('users');
             $table->foreign('reciever')->references('id')->on('users');
             $table->enum('status', ['seen', 'unseen', 'deleted'])->default('unseen');
+            $table->enum('forward', ['yes', 'no'])->default('no');
             $table->timestamp('time');
         });
     }

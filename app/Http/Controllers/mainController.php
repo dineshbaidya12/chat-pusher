@@ -171,12 +171,12 @@ class mainController extends Controller
                 $formattedTime = $now->format('h:iA');
                 $unreadMsg = DB::table('messages')->where('sender', $authUser->id)->where('reciever', $request->id)->where('status', 'unseen')->count();
                 $unreadMsg = $unreadMsg > 9 ? '9+' : $unreadMsg;
-                broadcast(new PusherBroadcast($message, $id, $formattedTime))->toOthers();
+                broadcast(new PusherBroadcast($message, $id, $formattedTime, $msgId))->toOthers();
                 broadcast(new LeftBarBrodacast($request->id, $id, $message, $unreadMsg, $msgId))->toOthers();
             } catch (\Exception $err) {
                 dd($err);
             }
-            return response()->json(['status' => true, 'time' => Carbon::parse($now)->format('h:iA'), 'message' => $message]);
+            return response()->json(['status' => true, 'time' => Carbon::parse($now)->format('h:iA'), 'message' => $message, 'msgid' => $msgId]);
         } catch (\Exception $err) {
             dd($err);
             return response()->json(['status' => false, 'message' => 'Something went wrong ' . $err]);
@@ -426,6 +426,64 @@ class mainController extends Controller
             return response()->json(['status' => true, 'message' => 'status updated']);
         } catch (\Exception $err) {
             return response()->json(['status' => false, 'message' => 'something went wrong']);
+        }
+    }
+
+    public function forwardMessage(Request $request)
+    {
+        try {
+            $authUser = Auth::user();
+            if ($request->messageId == '') {
+                return response()->json(['status' => false, 'message' => 'message not found']);
+            }
+
+            $message = Message::where('id', $request->messageId)->where('status', '!=', 'deleted')->first();
+            if (!$message) {
+                return response()->json(['status' => false, 'message' => 'message not found']);
+            }
+
+            foreach ($request->checkedIds as $user) {
+                $selectedUser = User::find($user);
+                if (!$selectedUser) {
+                    //user not exist
+                    continue;
+                }
+                $connection = ConnectionModel::where(function ($query) use ($user, $authUser) {
+                    $query->where('first_user', $user)
+                        ->where('second_user', $authUser->id);
+                })->orWhere(function ($query) use ($user, $authUser) {
+                    $query->where('first_user', $authUser->id)
+                        ->where('second_user', $user);
+                })->where('status', 'connected')
+                    ->first();
+
+                if (!$connection) {
+                    //connection not exist
+                    continue;
+                }
+
+                $theMessage = new Message();
+                $theMessage->message = $message->message;
+                $theMessage->sender = $authUser->id;
+                $theMessage->reciever = $user;
+                $theMessage->status = 'unseen';
+                $theMessage->forward = 'yes';
+                $theMessage->time = Carbon::now();
+                $theMessage->save();
+
+                $connection->last_message = $theMessage->id;
+                $connection->update();
+
+                $formattedTime = Carbon::now()->format('h:iA');
+                $unreadMsg = Message::where('sender', $authUser->id)->where('reciever', $user)->where('status', 'unseen')->count();
+                $unreadMsg = $unreadMsg > 9 ? '9+' : $unreadMsg;
+                broadcast(new PusherBroadcast($theMessage->message, $connection->id, $formattedTime, $theMessage->id, 'true'))->toOthers();
+                broadcast(new LeftBarBrodacast($user, $connection->id, $theMessage->message, $unreadMsg, $theMessage->id))->toOthers();
+            }
+
+            // return response()->json(['status' => true, 'message' => 'forward successfully']);
+        } catch (\Exception $err) {
+            return response()->json(['status' => false, 'message' => 'something went wrong.']);
         }
     }
 }

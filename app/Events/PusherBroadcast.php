@@ -9,6 +9,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use App\Models\Message;
 
 class PusherBroadcast implements ShouldBroadcast
 {
@@ -18,13 +19,19 @@ class PusherBroadcast implements ShouldBroadcast
     public string $message;
     public int $id;
     public string $formattedTime;
+    public string $forward;
+    public int $messageId;
+    public object $messagedata;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(string $message, int $id, string $formattedTime)
+    public function __construct(string $message, int $id, string $formattedTime, int $messageId, string $forward = 'false')
     {
+        $this->messageId = $messageId;
+        $this->messagedata = Message::find($messageId);
         $this->message = $message;
+        $this->forward = $forward;
         $this->id = $id;
         $this->formattedTime = $formattedTime;
     }

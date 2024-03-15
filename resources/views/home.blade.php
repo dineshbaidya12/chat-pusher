@@ -1022,7 +1022,9 @@
                     let newDivContent =
                         `<div class="conversations-sender conversations">
                             <div class="clock"><i class="fa-regular fa-clock"></i></div>
-                            <span class="message_content"><p>${messageWithoutHTML}</p></span></div>
+                            <span class="message_content"><p>${messageWithoutHTML}</p></span>
+                            <span class="place-the-tick-img"></span>
+                            </div>
                     <div class="message-time">${formattedTime}</div>`;
                     newDiv.html(newDivContent);
                     chatsDiv.append(newDiv);
@@ -1049,10 +1051,11 @@
                                     confirmButtonText: 'OK'
                                 });
                             }else{
-                                $('.clock').css('display', 'none');
+                                $('.clock').remove();
+                                $('.place-the-tick-img').html('<img src="{{asset("assets/images/dummy-imgs/tick-black.png")}}" class="message-seen-status-img">');
                                 $('#conv-' + convId +' img').attr('src', "{{ asset('assets/images/dummy-imgs/tick.png') }}");
                                 $('#conv-' + convId +' img').attr('class', "status-unread");
-                                newDiv.data('msgid', data.msgid);
+                                newDiv.attr('data-msgid', data.msgid);
                             }
                         }
                     });
@@ -1085,9 +1088,11 @@
 
             $(document).on('mousedown touchstart', '.parent-conv', function(e) {
                 let parentConv = $(this);
-                timer = setTimeout(function() {
-                    openMoreMessageOpt(parentConv);
-                }, 500);
+                if(parentConv.data('msgid') != 0){
+                    timer = setTimeout(function() {
+                        openMoreMessageOpt(parentConv);
+                    }, 500);
+                }
             }).on('mouseup touchend', function() {
                 clearTimeout(timer);
             });
@@ -1134,10 +1139,18 @@
                             '_token': '{{ csrf_token() }}'
                         },
                         success: function(response) {
+                            console.log(response);
                             $('.forward-btn').html('<i class="fa fa-paper-plane"></i>');
                             bottomNotification('message forwared');
                             $('#forewardmessage').modal('hide');
                             closeMoreMessageOpt();
+
+                            checkedIds.forEach(element => {
+                                $('div[data-id="'+element+'"] .message-details').html('<img src="{{asset("assets/images/dummy-imgs/tick.png")}}" alt="tick" class="status-unread">'+response.message);
+                            });
+
+
+
                         },
                         error: function(error) {
                             console.log(error);
@@ -1239,7 +1252,7 @@
                     if(data.messagedata.sender == {{$authUser->id}}){
                         realChatHtml = `<div class="parent-conv sender" data-msgid="${data.messagedata.id}"><div class="conversations-sender conversations">`;
                     }else{
-                        realChatHtml = `<div class="parent-conv reciever"><div class="conversations-reciever conversations">`;
+                        realChatHtml = `<div class="parent-conv reciever" data-msgid="${data.messagedata.id}"><div class="conversations-reciever conversations">`;
                     }
 
                     if(data.forward == 'true'){
@@ -1247,6 +1260,7 @@
                     }
 
                     realChatHtml += `<span class="message_content"><p>`+data.message + `</p></span>
+                        <img src="{{asset('assets/images/dummy-imgs/tick-black.png')}}" class="message-seen-status-img">
                         </div>
                         <div class="message-time">` + data.formattedTime + `</div>
                     </div>
@@ -1330,8 +1344,8 @@
                             </p>
                         </div>
                         <div class="col-5 p-0 req-action">
-                            <button data-id="${data.connectionId}" data-action="accept" data-username="${data.userDetails.username}" class="btn req-action-btn accept-btn"><img src="http://192.168.0.83:8000/assets/images/dummy-imgs/tick.png" alt="Accept"></button>
-                            <button data-id="${data.connectionId}" data-action="reject" data-username="${data.userDetails.username}" class="btn req-action-btn reject-btn"><img src="http://192.168.0.83:8000/assets/images/dummy-imgs/reject.png" alt="Accept"></button>
+                            <button data-id="${data.connectionId}" data-action="accept" data-username="${data.userDetails.username}" class="btn req-action-btn accept-btn"><img src="{{asset("assets/images/dummy-imgs/tick.png")}}" alt="Accept"></button>
+                            <button data-id="${data.connectionId}" data-action="reject" data-username="${data.userDetails.username}" class="btn req-action-btn reject-btn"><img src="{{asset("assets/images/dummy-imgs/reject.png")}}" alt="reject"></button>
                         </div>
                     </div>
                     <span class="separtor"></span>`;
@@ -1349,6 +1363,14 @@
                         $('.no-requests').css('display', 'none');
                         $('#count-req-conn').css('display', 'inline-block');
                         $('#count-req-conn').html(data.countReq);
+                    }
+                }else if(data.type == 'messageSeen'){
+                    $('div[data-id="'+data.whoSeen+'"] .message-details img').attr('src', '{{asset("assets/images/dummy-imgs/tick-double.png")}}');
+                    $('div[data-id="'+data.whoSeen+'"] .message-details img').attr('class', 'status-read');
+                    if(data.connectionId == currentConversationId){
+                        let tickSrc = "{{asset('assets/images/dummy-imgs/tick-black.png')}}";
+                        let doubletickSrc = "{{asset('assets/images/dummy-imgs/double-tick-seen.png')}}";
+                        $('img[src="'+tickSrc+'"]').attr('src', doubletickSrc);
                     }
                 }
             });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\AccesptFriendRequest;
 use App\Events\LeftBarBrodacast;
+use App\Events\MessageSeenBroadcast;
 use App\Events\PusherBroadcast;
 use App\Events\SendFriendRequest;
 use App\Events\TypingStatus;
@@ -103,6 +104,7 @@ class mainController extends Controller
                 ->orderBy('time', 'ASC')
                 ->get();
 
+            $unseenMessages = Message::where('reciever', $authUserId)->where('sender', $id)->where('status', 'unseen')->count();
             Message::where('reciever', $authUserId)->where('sender', $id)->where('status', 'unseen')->update(['status' => 'seen']);
 
             $otherPersoDetails = User::where('id', $id)->select('id', 'name', 'profile_pic')->first();
@@ -118,6 +120,10 @@ class mainController extends Controller
             $otherPersoneId = $otherPersoDetails->id;
 
             $connectionId = $this->connectionId($otherPersoneId,  $authUserId);
+
+            if ($unseenMessages > 0) {
+                broadcast(new MessageSeenBroadcast($otherPersoneId, $authUserId, $connectionId))->toOthers();
+            }
 
             $response = [
                 'html' => view('chats', compact('messages', 'otherPersoneName', 'otherPersonImage', 'otherPersoneId', 'connectionId'))->render(),
@@ -408,6 +414,8 @@ class mainController extends Controller
             if ($msg->status == 'unseen') {
                 $msg->status = 'seen';
                 $msg->update();
+                $connectionId = $this->connectionId($msg->sender, $msg->reciever);
+                broadcast(new MessageSeenBroadcast($msg->sender, $msg->reciever, $connectionId))->toOthers();
                 return 'seen';
             }
             return 'diff status';
@@ -481,7 +489,7 @@ class mainController extends Controller
                 broadcast(new LeftBarBrodacast($user, $connection->id, $theMessage->message, $unreadMsg, $theMessage->id))->toOthers();
             }
 
-            // return response()->json(['status' => true, 'message' => 'forward successfully']);
+            return response()->json(['status' => true, 'message' => \Illuminate\Support\Str::limit(strip_tags($theMessage->message), 30)]);
         } catch (\Exception $err) {
             return response()->json(['status' => false, 'message' => 'something went wrong.']);
         }

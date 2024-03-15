@@ -29,9 +29,9 @@
             $lastFormattedDate = $formattedDate;
         @endphp
         @if ($msg->sender == auth()->user()->id)
-            <div class="parent-conv sender" data-msgid="{{$msg->id}}">
+            <div class="parent-conv sender" {{$msg->status == 'deleted' ? 'data-msgid=0' : 'data-msgid='.$msg->id.''}} >
                 <div class="conversations-sender conversations">
-                    @if ($msg->forward == 'yes')
+                    @if ($msg->forward == 'yes' && $msg->status !== 'deleted')
                         <p class="forward-msg"><i class="fas fa-share"></i>Forwarded</p>
                     @endif
                     <span class="message_content">
@@ -46,13 +46,18 @@
                             @endif
                         </p>
                     </span>
+                    @if ($msg->status == 'seen')
+                        <img src="{{asset('assets/images/dummy-imgs/double-tick-seen.png')}}" class="message-seen-status-img">
+                    @elseif ($msg->status == 'unseen')
+                        <img src="{{asset('assets/images/dummy-imgs/tick-black.png')}}" class="message-seen-status-img">
+                    @endif
                 </div>
                 <div class="message-time">{{ \Carbon\Carbon::parse($msg->time)->format('h:iA') }}</div>
             </div>
         @else
-            <div class="parent-conv reciever" data-msgid="{{$msg->id}}">
+            <div class="parent-conv reciever" {{$msg->status == 'deleted' ? 'data-msgid=0' : 'data-msgid='.$msg->id.''}} >
                 <div class="conversations-reciever conversations">
-                    @if ($msg->forward == 'yes')
+                    @if ($msg->forward == 'yes' && $msg->status !== 'deleted')
                         <p class="forward-msg"><i class="fas fa-share"></i>Forwarded</p>
                     @endif
                     <span class="message_content">
@@ -67,6 +72,12 @@
                             @endif
                         </p>
                     </span>
+                    @if ($msg->status == 'seen')
+                        <img src="{{asset('assets/images/dummy-imgs/double-tick-seen.png')}}" class="message-seen-status-img">
+                    @elseif ($msg->status == 'unseen')
+                        <img src="{{asset('assets/images/dummy-imgs/tick-black.png')}}" class="message-seen-status-img">
+                    @endif
+                    
                 </div>
                 <div class="message-time">{{ \Carbon\Carbon::parse($msg->time)->format('h:iA') }}</div>
             </div>

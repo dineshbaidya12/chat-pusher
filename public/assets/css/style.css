@@ -473,7 +473,7 @@ hr {
 }
 
 .conversations {
-    padding: 5px 16px;
+    padding: 5px 20px 10px 16px;
     max-width: 60%;
     width: fit-content;
     position: relative;
@@ -1122,6 +1122,13 @@ emoji-picker {
     font-style: italic;
     font-size: 12px;
     color: gray;
+}
+
+.message-seen-status-img {
+    height: 9px;
+    bottom: 5px;
+    right: 6px;
+    position: absolute;
 }
 
 

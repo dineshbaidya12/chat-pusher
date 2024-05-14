@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
-use Mews\Purifier\Facades\Purifier;
+// use Mews\Purifier\Facades\Purifier;
 
 class mainController extends Controller
 {
@@ -157,7 +157,8 @@ class mainController extends Controller
             // Authentication Passed Now Insert The Message
 
             $now = Carbon::now();
-            $cleanContent = Purifier::clean($request->message);
+            $cleanContent = $request->message;
+            // $cleanContent = Purifier::clean($request->message);$request->message;
             $message = nl2br($cleanContent);
 
             $msgId = DB::table('messages')->insertGetId([

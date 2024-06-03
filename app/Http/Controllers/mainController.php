@@ -71,10 +71,8 @@ class mainController extends Controller
             ->orderBy('created_at', 'ASC')
             ->select('id', 'first_user', 'second_user', 'last_message', 'created_at')
             ->get();
-
-        $newUsers = User::where('type', 'user')->where('status', 'active')->whereNot('id', $authUser->id)->orderBy('created_at', 'DESC')->limit(50)->select('name', 'username', 'email', 'profile_pic', 'id')->get();
         // dd($requestsLists->toArray());
-        return view('home', compact('connections', 'requestsLists', 'authUser', 'newUsers'));
+        return view('home', compact('connections', 'requestsLists', 'authUser'));
     }
 
     public function getMessage($id, $username)
@@ -211,14 +209,48 @@ class mainController extends Controller
         }
     }
 
-    public function searchUser($username)
+    public function newUsers(){
+        $authUser = Auth::user();
+        $newUsers = User::where('type', 'user')->where('status', 'active')->whereNot('id', $authUser->id)->orderBy('created_at', 'DESC')->limit(50)->select('name', 'username', 'email', 'profile_pic', 'id')->get();
+        $response = "";
+        foreach ($newUsers as $user) {
+            if ($user->id == $authUser->id) {
+                continue;
+            }
+            $profilePic = '';
+            if ($user->profile_pic != '') {
+                $profilePic = asset('user_profile_picture/thumb/' . $user->profile_pic);
+            } else {
+                $profilePic = asset('assets/images/dummy-imgs/default-profile-picture.jpg');
+            }
+
+            $response .= "
+                <div class='col-6 col-lg-4 col-md-6 searched-user'>
+                <div class='user-searched-wrpper'>
+                    <div class='searched-user-img'>
+                        <img src=\"$profilePic\" alt=\"$user->username\">
+                    </div>
+                </div>
+                <p class='searched-names'>$user->name($user->username)</p>
+                <p class='searched-desc'>$user->email</p>
+                <button class='request-connection-btn' data-id=\"$user->id\" data-name=\"$user->name ($user->username)\">Request</button>
+            </div>
+            ";
+        }
+        $response == '' ? $response = '<p class="no-user-found">No User Found</p>' :  $response;
+
+        return response()->json(['status' => true, 'message' => $response]);
+    }
+
+    public function searchUser($username = "")
     {
         try {
-            if ($username == '') {
-                return response()->json(['status' => true, 'message' => '<p class="no-user-found">No User Found</p>']);
-            }
             $authUser = Auth::user();
-            $users = User::where('username', 'like', '%' . $username . '%')->orWhere('name', 'like', '%' . $username . '%')->where('status', 'active')->where('type', 'user')->select('id', 'name', 'username', 'profile_pic', 'email')->limit(50)->get();
+            if($username == '---'){
+                $users = User::where('status', 'active')->where('type', 'user')->select('id', 'name', 'username', 'profile_pic', 'email')->limit(50)->get();
+            }else{
+                $users = User::where('username', 'like', '%' . $username . '%')->orWhere('name', 'like', '%' . $username . '%')->where('status', 'active')->where('type', 'user')->select('id', 'name', 'username', 'profile_pic', 'email')->limit(50)->get();
+            }
             $response = '';
             foreach ($users as $user) {
                 if ($user->id == $authUser->id) {

@@ -72,12 +72,11 @@
                             @endif
                         </p>
                     </span>
-                    @if ($msg->status == 'seen')
+                    {{-- @if ($msg->status == 'seen')
                         <img src="{{asset('assets/images/dummy-imgs/double-tick-seen.png')}}" class="message-seen-status-img">
                     @elseif ($msg->status == 'unseen')
                         <img src="{{asset('assets/images/dummy-imgs/tick-black.png')}}" class="message-seen-status-img">
-                    @endif
-                    
+                    @endif --}}
                 </div>
                 <div class="message-time">{{ \Carbon\Carbon::parse($msg->time)->format('h:iA') }}</div>
             </div>

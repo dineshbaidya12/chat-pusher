@@ -38,4 +38,5 @@ Route::group(['middleware' => 'checkUserLoggedIn'], function () {
     Route::get('/seen-msg/{id}', [MainController::class, 'seenMsg'])->name('seen-msg');
     Route::post('typing-status-change', [MainController::class, 'typingStatusChange'])->name('typing-status-change');
     Route::post('forward-message', [MainController::class, 'forwardMessage'])->name('forward-message');
+    Route::get('new-users', [MainController::class, 'newUsers'])->name('new-users');
 });

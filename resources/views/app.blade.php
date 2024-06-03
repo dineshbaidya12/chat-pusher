@@ -1,0 +1,6 @@
+@include('includes.header')
+@yield('custom-styles')
+@yield('content')
+@yield('modals')
+@yield('custom-scripts')
+@include('includes.footer')

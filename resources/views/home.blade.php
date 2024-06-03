@@ -1,80 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Chat App</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/responsive.css') }}">
-    {{-- Jquery --}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    {{-- Bootstrap --}}
-    <link rel="stylesheet" href="{{ asset('bootstrap-4.0.0/css/bootstrap.min.css') }}">
-    <script src="{{ asset('bootstrap-4.0.0/js/bootstrap.bundle.min.js') }}"></script>
-    {{-- Font Awesome --}}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    {{-- Include EmojiPicker CSS and JS --}}
-    {{-- <link rel="stylesheet" href="/path/to/emoji-picker.css">
-    <script src="/path/to/emoji-picker.js"></script> --}}
-    <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.1/sweetalert2.min.css" />
-    <link href=" https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.min.css " rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
-    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
-    <style>
-        .inner-rightbar-cover {
-            background: url("{{ asset('assets/images/bg/welcome.jpg') }}") no-repeat center center/cover;
-        }
-
-        .conversation-chats-container {
-            background: url("{{ asset('assets/images/bg/dark-travel.jpeg') }}") no-repeat center/cover;
-        }
-
-        @keyframes rotate {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .preloader {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-        }
-
-        .preloader img {
-            height: 10%;
-            animation: rotate 2s linear infinite;
-        }
-
-        .inner-search{
-            background:  url("{{ asset('assets/images/bg/search.jpeg') }}") no-repeat center center/cover;
-        }
-    </style>
-</head>
-
-<body class="position-relative">
-    <div id="bottomNotification">
-        <p></p>
-    </div>
-    <div class="preloader">
-        <img src="{{ asset('assets/images/bg/buffer.png') }}">
-    </div>
-    <div class="page-wrapper">
+@section('content')  
+<div class="page-wrapper">
         <div class="container-flued">
             <div class="row">
                 <div class="col-12 col-md-4 col-lg-3 left-bar inside-container" id="left-bar">
                     <div class="row">
                         <div class="left-bar-header p-2 w-100 position-relative">
-                            <div class="add-new-connections position-absolute" id="add-new-connections">
+                            <div class="add-new-connections" id="add-new-connections">
                                 <img src="{{ asset('assets/images/dummy-imgs/add.png') }}">
                             </div>
                             <ul class="position-absolute more-option-left" id="more-option-left">
@@ -432,9 +365,9 @@
                                 <p class="helping-text">To get exact same person please search by his/her username. eg: johndoe123</p>
                             </div>
                         </div>
-                        <div class="col-12 suggetion-search-div">
+                        <div class="col-12 suggetion-search-div" id="suggetion-search-div">
                             <div class="row scrollable" id="search-content-here">
-                                @foreach ($newUsers as $user)
+                                {{-- @foreach ($newUsers as $user)
                                 <div class='col-6 col-lg-4 col-md-6 searched-user'>
                                     <div class='user-searched-wrpper'>
                                         <div class='searched-user-img'>
@@ -445,7 +378,7 @@
                                     <p class='searched-desc'>{{$user->email}}</p>
                                     <button class='request-connection-btn' data-id="{{$user->id}}" data-name="{{ $user->name}}({{ $user->username}})">Request</button>
                                 </div>
-                                @endforeach
+                                @endforeach --}}
                             </div>
                         </div>
                     </div>
@@ -455,9 +388,10 @@
             </div>
         </div>
     </div>
+@endsection
 
 
-    {{-- ------------------ Model  -------------------- --}}
+@section('modals')
     <div class="modal fade" id="forewardmessage" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -528,10 +462,9 @@
         </div>
         </div>
     </div>
-    {{-- ------------------ MOdel  -------------------- --}}
+@endsection
 
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.20/dist/sweetalert2.min.js"></script>
+@section('custom-scripts')
     <script>
         @if (session('error'))
             Swal.fire({
@@ -805,19 +738,34 @@
 
             $('.add-new-connections').on('click', function() {
                 resetConversationId();
-                $('#request-user-id').val('').trigger('input');
-                // $('#requestModel').modal('show');
-                if(window.innerWidth > 767){
-                    $('.all-chats-show').css('display', 'none');
-                    $('.inner-rightbar-cover').css('display', 'none');
-                    $('.request-main-div').css('display', 'block');
-                }else{
-                    $('#left-bar').css('display', 'none');
-                    $('#right-bar').css('display', 'block');
-                    $('.all-chats-show').css('display', 'none');
-                    $('.inner-rightbar-cover').css('display', 'none');
-                    $('.request-main-div').css('display', 'block');
-                }
+
+                $.ajax({
+                    url: "{{ route('new-users') }}",
+                    type: 'GET',
+                    success: function(data) {
+                        if(data.status){
+                            $('#search-content-here').html(data.message);
+                            $('#request-user-id').val('').trigger('input');
+                            if(window.innerWidth > 767){
+                                $('.all-chats-show').css('display', 'none');
+                                $('.inner-rightbar-cover').css('display', 'none');
+                                $('.request-main-div').css('display', 'block');
+                            }else{
+                                $('#left-bar').css('display', 'none');
+                                $('#right-bar').css('display', 'block');
+                                $('.all-chats-show').css('display', 'none');
+                                $('.inner-rightbar-cover').css('display', 'none');
+                                $('.request-main-div').css('display', 'block');
+                            }
+                        }else{
+                            alert('Something went wrong.');
+                        }
+                    }
+                });
+
+
+
+                
             });
 
             $('.back-to-main-chats-show').on('click', function() {
@@ -833,16 +781,17 @@
 
             $('#request-user-type').on('input', function() {
                 let username = $(this).val();
-                if (username != '') {
-                    $.ajax({
-                        url: "{{ route('search-user', ['username' => ':username']) }}"
-                            .replace(':username', username),
-                        type: 'GET',
-                        success: function(data) {
-                            $('#search-content-here').html(data.message);
-                        }
-                    });
-                } 
+                if(username == ""){
+                    username = "---";
+                }
+                $.ajax({
+                    url: "{{ route('search-user', ['username' => ':username']) }}"
+                        .replace(':username', username),
+                    type: 'GET',
+                    success: function(data) {
+                        $('#search-content-here').html(data.message);
+                    }
+                });
             });
 
             $(document).on('click','.request-connection-btn', function() {
@@ -1531,6 +1480,4 @@
         });
     </script>
     {{-- -------------------- shortcuts and click event ---------------- --}}
-</body>
-
-</html>
+@endsection

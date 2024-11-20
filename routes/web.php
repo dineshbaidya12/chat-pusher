@@ -40,3 +40,4 @@ Route::group(['middleware' => 'checkUserLoggedIn'], function () {
     Route::post('forward-message', [MainController::class, 'forwardMessage'])->name('forward-message');
     Route::get('new-users', [MainController::class, 'newUsers'])->name('new-users');
 });
+Route::get('test', [MainController::class, 'test']);

@@ -526,4 +526,7 @@ class mainController extends Controller
             return response()->json(['status' => false, 'message' => 'something went wrong.']);
         }
     }
+    public function test(){
+        echo 'asdasd';
+    }
 }
